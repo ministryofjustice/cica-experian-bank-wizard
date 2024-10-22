@@ -1,0 +1,122 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "Your API name",
+        "description": "Your API description",
+        "version": "0.0.0",
+        "license": {
+            "name": "MIT"
+        },
+        "contact": {
+            "name": "API Support",
+            "email": "your-support-email@11ce303a-bd9d-41c9-8019-2946598c7a07.gov.uk"
+        }
+    },
+    "servers": [
+        {
+            "url": "/api/v1"
+        }
+    ],
+    "tags": [{"name": "Foos"}, {"name": "ProgressEntries"}],
+    "paths": {
+    
+    },
+    "components": {
+        "responses": {
+            "BadRequest": {
+                "description": "There is an issue with the request",
+                "content": {
+                    "application/vnd.api+json": {
+                        "schema": {
+                            "$ref": "./json-schemas/api/responses/400.json"
+                        },
+                        "example": {
+                            "errors": [
+                                {
+                                    "status": 400,
+                                    "title": "400 Bad Request",
+                                    "detail": "Request JSON is malformed"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "UnauthorizedError": {
+                "description": "Access token is missing or invalid",
+                "content": {
+                    "application/vnd.api+json": {
+                        "schema": {
+                            "$ref": "./json-schemas/api/responses/401.json"
+                        },
+                        "example": {
+                            "errors": [
+                                {
+                                    "status": 401,
+                                    "detail": "No authorization token was found"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "description": "The JWT doesn't permit access to this endpoint",
+                "content": {
+                    "application/vnd.api+json": {
+                        "schema": {
+                            "$ref": "./json-schemas/api/responses/403.json"
+                        },
+                        "example": {
+                            "errors": [
+                                {
+                                    "status": 403,
+                                    "title": "403 Forbidden",
+                                    "detail": "Insufficient scope"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "The specified resource was not found",
+                "content": {
+                    "application/vnd.api+json": {
+                        "schema": {
+                            "$ref": "./json-schemas/api/responses/404.json"
+                        },
+                        "example": {
+                            "errors": [
+                                {
+                                    "status": 404,
+                                    "title": "404 Not Found",
+                                    "detail": "Resource /api/v1/questionnaires/2d7caf89-2c72-469f-b19d-17f2a22270b6/sections/answers does not exist"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "Conflict": {
+                "description": "Conflict",
+                "content": {
+                    "application/vnd.api+json": {
+                        "schema": {
+                            "$ref": "./json-schemas/api/responses/409.json"
+                        },
+                        "example": {
+                            "errors": [
+                                {
+                                    "status": 409,
+                                    "title": "409 conflict",
+                                    "detail": "Endpoint /api/v1/questionnaires/68653be7-877f-4106-b91e-4ba8dac883f3/sections/system/answers accepts only resources of type \"answers\""
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
