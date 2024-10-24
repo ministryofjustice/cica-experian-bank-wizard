@@ -9,6 +9,7 @@ const pino = require('pino-http');
 const OpenApiValidator = require('express-openapi-validator');
 const errorHandler = require('./middleware/error-handler');
 const docsRouter = require('./docs/routes');
+const bankWizardRouter = require('./bankwizard/routes');
 
 process.env.DCS_LOG_LEVEL = 'debug';
 
@@ -66,7 +67,7 @@ app.use(
 // logging
 app.use(logger);
 // https://expressjs.com/en/api.html#express.json
-app.use(express.json({type: 'application/vnd.api+json'}));
+app.use(express.json({type: 'application/json'}));
 // https://expressjs.com/en/api.html#express.urlencoded
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -75,9 +76,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/docs', docsRouter);
 
+app.use(
+    '/v2/bankwizard',
+    OpenApiValidator.middleware({
+        apiSpec: './openapi/openapi.json',
+        validateRequests: true,
+        validateResponses: false,
+        validateSecurity: false,
+    }),
+    bankWizardRouter,
+);
+
 app.use((req, res, next) => {
     // Default to JSON:API content type for all subsequent responses
-    res.type('application/vnd.api+json');
+    res.type('application/json');
     // https://stackoverflow.com/a/22339262/2952356
     // `process.env.npm_package_version` only works if you use npm start to run the app.
     res.set('Application-Version', process.env.npm_package_version);
