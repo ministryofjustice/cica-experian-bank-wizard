@@ -1,32 +1,156 @@
 {
     "openapi": "3.0.2",
     "info": {
-        "title": "Your API name",
-        "description": "Your API description",
-        "version": "0.0.0",
+        "title": "CICA Experian BankWizard Integration Service",
+        "description": "Handle BankWizard requests",
+        "version": "0.0.1",
         "license": {
             "name": "MIT"
         },
         "contact": {
             "name": "API Support",
-            "email": "your-support-email@11ce303a-bd9d-41c9-8019-2946598c7a07.gov.uk"
+            "email": "api@cica.gov.uk"
         }
     },
     "servers": [
         {
-            "url": "/api/v1"
+            "url": "/v2/bankwizard"
         }
     ],
-    "tags": [{"name": "Foos"}, {"name": "ProgressEntries"}],
+    "tags": [
+        {
+            "name": "BankWizard"
+        }
+    ],
     "paths": {
-    
+        "/personal": {
+            "post": {
+                "tags": [
+                    "BankWizard"
+                ],
+                "summary": "Submit a personal type request",
+                "description": "Submit a personal type request to the Experian BankWizard service",
+                "operationId": "personal",
+                "requestBody": {
+                    "description": "Personal request template",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "./json-schemas/api/bankwizard/personal/post/req/200.json"
+                            },
+                            "example": {
+                                "firstName": "John",
+                                "lastName": "Doe",
+                                "dOB": "01/01/2000",
+                                "sortCode": "01-01-01",
+                                "accountNumber": "12345678",
+                                "rollNumber": "",
+                                "houseNumber": "1",
+                                "street": "Real Road",
+                                "postCode": "AA1 1AA"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "./json-schemas/api/bankwizard/personal/post/res/200.json"
+                                },
+                                "example": {
+                                    "data": "true"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                }
+            }
+        },
+        "/company": {
+            "post": {
+                "tags": [
+                    "BankWizard"
+                ],
+                "summary": "Submit a company type request",
+                "description": "Submit a company type request to the Experian BankWizard service",
+                "operationId": "company",
+                "requestBody": {
+                    "description": "Company request template",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "./json-schemas/api/bankwizard/company/post/req/200.json"
+                            },
+                            "example": {
+                                "companyName": "My Company Ltd.",
+                                "sortCode": "01-01-01",
+                                "accountNumber": "12345678",
+                                "rollNumber": "",
+                                "houseNumber": "1",
+                                "street": "Real Road",
+                                "postCode": "AA1 1AA"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "./json-schemas/api/bankwizard/company/post/res/200.json"
+                                },
+                                "example": {
+                                    "data": "true"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                }
+            }
+        },
+        "/status": {
+            "get": {
+                "tags": ["BankWizard"],
+                "summary": "Status check",
+                "description": "Returns a status 200 if the service is currently running",
+                "operationId": "status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "./json-schemas/api/bankwizard/status/get/res/200.json"
+                                },
+                                "example": {
+                                    "status": "Service up"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     },
     "components": {
         "responses": {
             "BadRequest": {
                 "description": "There is an issue with the request",
                 "content": {
-                    "application/vnd.api+json": {
+                    "application/json": {
                         "schema": {
                             "$ref": "./json-schemas/api/responses/400.json"
                         },
@@ -45,7 +169,7 @@
             "UnauthorizedError": {
                 "description": "Access token is missing or invalid",
                 "content": {
-                    "application/vnd.api+json": {
+                    "application/json": {
                         "schema": {
                             "$ref": "./json-schemas/api/responses/401.json"
                         },
@@ -63,7 +187,7 @@
             "Forbidden": {
                 "description": "The JWT doesn't permit access to this endpoint",
                 "content": {
-                    "application/vnd.api+json": {
+                    "application/json": {
                         "schema": {
                             "$ref": "./json-schemas/api/responses/403.json"
                         },
@@ -82,7 +206,7 @@
             "NotFound": {
                 "description": "The specified resource was not found",
                 "content": {
-                    "application/vnd.api+json": {
+                    "application/json": {
                         "schema": {
                             "$ref": "./json-schemas/api/responses/404.json"
                         },
@@ -101,7 +225,7 @@
             "Conflict": {
                 "description": "Conflict",
                 "content": {
-                    "application/vnd.api+json": {
+                    "application/json": {
                         "schema": {
                             "$ref": "./json-schemas/api/responses/409.json"
                         },

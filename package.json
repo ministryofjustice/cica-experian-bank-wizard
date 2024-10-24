@@ -48,6 +48,7 @@
         "nodemon": "^3.1.7",
         "prettier": "^3.3.3",
         "speccy": "github:wework/speccy#740d19d88935db7735250c16abc2ad09256b5854",
+        "supertest": "^7.0.0",
         "yamljs": "^0.3.0"
     },
     "license": "MIT"
