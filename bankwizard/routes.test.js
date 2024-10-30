@@ -1,42 +1,28 @@
 'use strict';
 
 const request = require('supertest');
-const app = require('../app');
 
-const personalRequest = {
-    firstName: 'John',
-    lastName: 'Doe',
-    dOB: '2000-01-01',
-    sortCode: '01-01-01',
-    accountNumber: '12345678',
-    rollNumber: '',
-    houseNumber: '1',
-    street: 'Real Road',
-    postCode: 'AA1 1AA',
-};
-
-const companyRequest = {
-    companyName: 'Test Ltd.',
-    sortCode: '01-01-01',
-    accountNumber: '12345678',
-    rollNumber: '',
-    houseNumber: '1',
-    street: 'Real Road',
-    postCode: 'AA1 1AA',
-};
+const personalRequest = require('../testing/personalRequest');
+const companyRequest = require('../testing/companyRequest');
 
 beforeEach(() => {
     jest.resetModules();
 });
 
 describe('REST endpoint tests', () => {
-    jest.doMock('./bankwizard-service.js', () => {
-        const bankwizardServiceMock = {
-            bankWizardPersonalRequest: jest.fn(() => true),
-            bankWizardCompanyRequest: jest.fn(() => false),
-        };
-        return () => bankwizardServiceMock;
-    });
+    jest.mock('./bankwizard-service', () => ({
+        // eslint-disable-next-line no-unused-vars
+        bankWizardPersonalRequest: jest.fn((req, res, next) => {
+            res.status(200).json('test');
+        }),
+        // eslint-disable-next-line no-unused-vars
+        bankWizardCompanyRequest: jest.fn((req, res, next) => {
+            res.status(200).json('test');
+        }),
+    }));
+
+    // eslint-disable-next-line global-require
+    const app = require('../app');
 
     describe('POST /v2/bankwizard/personal', () => {
         it('should return status 200 and give a normal response when the request is valid', async () => {
@@ -44,7 +30,6 @@ describe('REST endpoint tests', () => {
                 .post('/v2/bankwizard/personal')
                 .send(personalRequest);
             expect(response.status).toEqual(200);
-            expect(response.body).toEqual(true);
         });
 
         it('should return status 400 when the request is malformed', async () => {
@@ -59,7 +44,6 @@ describe('REST endpoint tests', () => {
         it('should return status 200 and give a normal response when the request is valid', async () => {
             const response = await request(app).post('/v2/bankwizard/company').send(companyRequest);
             expect(response.status).toEqual(200);
-            expect(response.body).toEqual(false);
         });
 
         it('should return status 400 when the request is malformed', async () => {

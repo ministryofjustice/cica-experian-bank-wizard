@@ -1,10 +1,19 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Personal request response",
-    "required": ["data"],
+    "title": "Company request response",
+    "required": ["validateScore", "branchName", "bankName", "companyScore"],
     "properties": {
-        "data": {
-            "type": "boolean"
+        "validateScore": {
+            "$ref": "../../../../../models/definitions/digit.json"
+        },
+        "branchName": {
+            "type": "string"
+        },
+        "bankName": {
+            "type": "string"
+        },
+        "companyScore": {
+            "$ref": "../../../../../models/definitions/digit.json"
         }
     }
 }

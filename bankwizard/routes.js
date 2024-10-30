@@ -2,15 +2,13 @@
 
 const express = require('express');
 
-const createBankWizardService = require('./bankwizard-service');
+const bankWizardService = require('./bankwizard-service');
 
 const router = express.Router();
 
 router.route('/personal').post((req, res, next) => {
     try {
-        const bankWizardService = createBankWizardService();
-        const answer = bankWizardService.bankWizardPersonalRequest(req.body);
-        res.status(200).json(answer);
+        bankWizardService.bankWizardPersonalRequest(req.body, res, next);
     } catch (err) {
         next(err);
     }
@@ -18,9 +16,7 @@ router.route('/personal').post((req, res, next) => {
 
 router.route('/company').post((req, res, next) => {
     try {
-        const bankWizardService = createBankWizardService();
-        const answer = bankWizardService.bankWizardCompanyRequest(req.body);
-        res.status(200).json(answer);
+        bankWizardService.bankWizardCompanyRequest(req.body, res, next);
     } catch (err) {
         next(err);
     }

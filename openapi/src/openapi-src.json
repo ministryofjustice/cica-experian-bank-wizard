@@ -62,7 +62,11 @@
                                     "$ref": "./json-schemas/api/bankwizard/personal/post/res/200.json"
                                 },
                                 "example": {
-                                    "data": "true"
+                                    "validateScore": true,
+                                    "branchName": "Test branch",
+                                    "bankName": "Test institution",
+                                    "personalScore": 1,
+                                    "addressScore": 2
                                 }
                             }
                         }
@@ -110,7 +114,10 @@
                                     "$ref": "./json-schemas/api/bankwizard/company/post/res/200.json"
                                 },
                                 "example": {
-                                    "data": "true"
+                                    "validateScore": true,
+                                    "branchName": "Test branch",
+                                    "bankName": "Test institution",
+                                    "companyScore": 1
                                 }
                             }
                         }
@@ -123,7 +130,9 @@
         },
         "/status": {
             "get": {
-                "tags": ["BankWizard"],
+                "tags": [
+                    "BankWizard"
+                ],
                 "summary": "Status check",
                 "description": "Returns a status 200 if the service is currently running",
                 "operationId": "status",
