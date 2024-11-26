@@ -3,7 +3,7 @@
 module.exports = {
     firstName: 'John',
     lastName: 'Doe',
-    dOB: '2000-01-01',
+    dOB: '31-01-2000',
     sortCode: '01-01-01',
     accountNumber: '12345678',
     rollNumber: '1A',

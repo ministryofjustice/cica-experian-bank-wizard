@@ -60,4 +60,9 @@ describe('REST endpoint tests', () => {
             expect(response.status).toEqual(200);
         });
     });
+
+    it('should return status 404 for invalid endpoints', async () => {
+        const response = await request(app).get('/v2/bankwizard/notanendpoint').send();
+        expect(response.status).toEqual(404);
+    });
 });

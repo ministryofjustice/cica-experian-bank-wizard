@@ -11,20 +11,13 @@ const errorHandler = require('./middleware/error-handler');
 const docsRouter = require('./docs/routes');
 const bankWizardRouter = require('./bankwizard/routes');
 
-process.env.DCS_LOG_LEVEL = 'debug';
+if (!process.env.DCS_LOG_LEVEL) {
+    process.env.DCS_LOG_LEVEL = 'info';
+}
 
 const app = express();
 const logger = pino({
     level: process.env.DCS_LOG_LEVEL,
-    redact: {
-        paths: ['req.headers.authorization'],
-        censor: (unredactedValue) => {
-            const authorizationHeaderParts = unredactedValue.split('.');
-            return authorizationHeaderParts.length > 1
-                ? `Bearer REDACTED.${authorizationHeaderParts[1]}.REDACTED`
-                : 'REDACTED';
-        },
-    },
     print:
         process.env.NODE_ENV === 'production'
             ? false
@@ -34,7 +27,7 @@ const logger = pino({
                   translateTime: true,
                   // errorProps: 'req,res'
               },
-    customLogLevel: (res, err) => {
+    customLogLevel: (req, res, err) => {
         if (res.statusCode >= 400 && res.statusCode < 500) {
             return 'warn';
         }
@@ -44,6 +37,21 @@ const logger = pino({
         }
 
         return 'info';
+    },
+    serializers: {
+        req: (req) => ({
+            id: req.id,
+            method: req.method,
+            url: req.url,
+            remoteAddress: req.remoteAddress,
+            remotePort: req.remotePort,
+        }),
+        res: (res) => ({
+            statusCode: res.statusCode,
+        }),
+    },
+    transport: {
+        target: 'pino-pretty',
     },
 });
 
@@ -88,23 +96,13 @@ app.use(
 );
 
 app.use((req, res, next) => {
-    // Default to JSON:API content type for all subsequent responses
+    // Default to JSON content type for all subsequent responses
     res.type('application/json');
     // https://stackoverflow.com/a/22339262/2952356
     // `process.env.npm_package_version` only works if you use npm start to run the app.
     res.set('Application-Version', process.env.npm_package_version);
 
     next();
-});
-
-// Express doesn't treat 404s as errors. If the following handler has been reached then nothing else matched e.g. a 404
-// https://expressjs.com/en/starter/faq.html#how-do-i-handle-404-responses
-app.use((req) => {
-    const err = Error(`Endpoint ${req.url} does not exist`);
-    err.name = 'HTTPError';
-    err.statusCode = 404;
-    err.error = '404 Not Found';
-    throw err;
 });
 
 app.use((err, req, res, next) => {

@@ -41,11 +41,26 @@ function Verify(args, cb, headers, req) {
             dataAccessKey: 'stub-accesskey',
             accountVerificationStatus: 'Match',
         },
-        conditions: [],
+        conditions: [
+            {
+                severity: 'fake',
+                code: 999,
+            },
+        ],
     };
     if (args.personalInformation) {
+        // If the first name in the request is error or warning followed by a number
+        // attach this error condition to the response
+        if (
+            args.personalInformation.personal.firstName.startsWith('error ') ||
+            args.personalInformation.personal.firstName.startsWith('warning ')
+        ) {
+            res.conditions.push({
+                severity: args.personalInformation.firstname.split(' ')[0],
+                code: args.personalInformation.firstname.split(' ')[1],
+            });
+        }
         res.personalInformation = {
-            personalDetailsScore: 1,
             addressScore: 2,
             accountSetupDateMatch: 'Match',
             accountSetupDateScore: 3,
@@ -53,6 +68,15 @@ function Verify(args, cb, headers, req) {
             accountOwnerMatch: 'Match',
         };
     } else {
+        if (
+            args.companyInformation.companyName.startsWith('error ') ||
+            args.companyInformation.companyName.startsWith('warning ')
+        ) {
+            res.conditions.push({
+                severity: args.companyInformation.companyName.split(' ')[0],
+                code: args.companyInformation.companyName.split(' ')[1],
+            });
+        }
         res.companyInformation = {
             companyNameScore: 1,
             companyNameAndAddressScore: 2,
@@ -76,7 +100,7 @@ const service = {
 
 soap.listen(server, '/wsdl', service, wsdl, (err, res) => {
     if (err) {
-        console.log(err.message);
+        console.error(err.message);
     } else {
         console.log('Stub soap server started');
     }

@@ -42,7 +42,7 @@
                             "example": {
                                 "firstName": "John",
                                 "lastName": "Doe",
-                                "dOB": "01/01/2000",
+                                "dOB": "31-01-2000",
                                 "sortCode": "01-01-01",
                                 "accountNumber": "12345678",
                                 "rollNumber": "",

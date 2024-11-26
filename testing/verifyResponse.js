@@ -1,33 +1,33 @@
 'use strict';
 
-function response(req, personal) {
+function response(req, personal, conditions = [], found = true) {
     const res = {
         accountInformation: {
             sortCode: req.sortCode,
             accountNumber: req.accountNumber,
             rollNumber: req.rollNumber,
             dataAccessKey: 'test-accesskey',
-            accountVerificationStatus: 'Match',
+            accountVerificationStatus: found ? 'Match' : 'Unable to check',
         },
-        conditions: [],
+        conditions,
     };
     if (personal) {
         res.personalInformation = {
-            personalDetailsScore: 1,
-            addressScore: 2,
-            accountSetupDateMatch: 'Match',
-            accountSetupDateScore: 3,
-            accountTypeMatch: 'Match',
-            accountOwnerMatch: 'Match',
+            personalDetailsScore: found ? 1 : undefined,
+            addressScore: found ? 2 : undefined,
+            accountSetupDateMatch: found ? 'Match' : 'No Match',
+            accountSetupDateScore: found ? 3 : undefined,
+            accountTypeMatch: found ? 'Match' : 'No Match',
+            accountOwnerMatch: found ? 'Match' : 'No Match',
         };
     } else {
         res.companyInformation = {
-            companyNameScore: 1,
-            companyNameAndAddressScore: 2,
-            companyTypeMatch: 'Match',
-            registrationNumberMatch: 'Match',
-            proprietorDetailsScore: 3,
-            companyAccountSetupDateScore: 4,
+            companyNameScore: found ? 1 : undefined,
+            companyNameAndAddressScore: found ? 2 : undefined,
+            companyTypeMatch: found ? 'Match' : 'No Match',
+            registrationNumberMatch: found ? 'Match' : 'No Match',
+            proprietorDetailsScore: found ? 3 : undefined,
+            companyAccountSetupDateScore: found ? 4 : undefined,
         };
     }
     return res;
