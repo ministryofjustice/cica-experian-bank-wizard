@@ -14,8 +14,9 @@
         "middleware",
         "openapi",
         "public",
-        "questionnaire",
+        "bankwizard",
         "services",
+        "stubs",
         "app.js"
     ]
 }

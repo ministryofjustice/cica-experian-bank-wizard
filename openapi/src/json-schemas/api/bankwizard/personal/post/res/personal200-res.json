@@ -1,10 +1,9 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "Personal request response",
     "required": ["validateScore", "branchName", "bankName", "personalScore", "addressScore"],
     "properties": {
         "validateScore": {
-            "$ref": "../../../../../models/definitions/digit.json"
+            "type": "boolean"
         },
         "branchName": {
             "type": "string"

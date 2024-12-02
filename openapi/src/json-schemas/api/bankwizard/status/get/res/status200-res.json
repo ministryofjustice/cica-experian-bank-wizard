@@ -1,6 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Personal request response",
+    "title": "Status request response",
     "required": ["status"],
     "properties": {
         "status": {

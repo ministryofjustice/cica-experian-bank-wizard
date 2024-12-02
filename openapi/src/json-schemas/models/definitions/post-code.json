@@ -1,5 +1,4 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "post-code",
     "type": "string",
     "pattern": "^([A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}|GIR ?0A{2})$"

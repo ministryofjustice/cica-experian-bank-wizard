@@ -1,15 +1,7 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "additionalProperties": false,
-    "required": [
-        "companyName",
-        "sortCode",
-        "accountNumber",
-        "houseNumber",
-        "street",
-        "postCode"
-    ],
+    "required": ["companyName", "sortCode", "accountNumber", "houseNumber", "street", "postCode"],
     "properties": {
         "companyName": {
             "$ref": "../../../../../models/definitions/non-empty-string.json"
