@@ -1,0 +1,44 @@
+{
+    "title": "Personal request",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "firstName",
+        "lastName",
+        "dOB",
+        "sortCode",
+        "accountNumber",
+        "houseNumber",
+        "street",
+        "postCode"
+    ],
+    "properties": {
+        "firstName": {
+            "$ref": "../../../../../models/definitions/non-empty-string.json"
+        },
+        "lastName": {
+            "$ref": "../../../../../models/definitions/non-empty-string.json"
+        },
+        "dOB": {
+            "$ref": "../../../../../models/definitions/date-of-birth.json"
+        },
+        "sortCode": {
+            "$ref": "../../../../../models/definitions/sort-code.json"
+        },
+        "accountNumber": {
+            "$ref": "../../../../../models/definitions/account-number.json"
+        },
+        "rollNumber": {
+            "type": "string"
+        },
+        "houseNumber": {
+            "type": "string"
+        },
+        "street": {
+            "type": "string"
+        },
+        "postCode": {
+            "$ref": "../../../../../models/definitions/post-code.json"
+        }
+    }
+}

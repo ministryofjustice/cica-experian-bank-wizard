@@ -1,0 +1,21 @@
+{
+    "title": "Personal request response",
+    "required": ["validateScore", "branchName", "bankName", "personalScore", "addressScore"],
+    "properties": {
+        "validateScore": {
+            "type": "boolean"
+        },
+        "branchName": {
+            "type": "string"
+        },
+        "bankName": {
+            "type": "string"
+        },
+        "personalScore": {
+            "$ref": "../../../../../models/definitions/digit.json"
+        },
+        "addressScore": {
+            "$ref": "../../../../../models/definitions/digit.json"
+        }
+    }
+}

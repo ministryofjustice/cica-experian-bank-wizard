@@ -1,0 +1,7 @@
+{
+    "title": "digit",
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 9
+}
+

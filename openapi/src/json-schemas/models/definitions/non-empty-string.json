@@ -1,0 +1,6 @@
+{
+    "title": "non-empty-string",
+    "type": "string",
+    "pattern": "^(?!\\s*$).+"
+}
+
