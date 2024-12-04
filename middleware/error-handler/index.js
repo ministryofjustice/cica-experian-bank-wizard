@@ -9,7 +9,10 @@ const errorType = require('./bankwizard-error-type');
 module.exports = async (err, req, res, next) => {
     const error = {};
 
-    if (err.code && err.code === 'ECONNREFUSED') {
+    if (
+        (err.code && (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT')) ||
+        err.status === 401
+    ) {
         error.error = 'Unable to connect to Experian';
         error.errorType = errorType.FATAL;
         return res.status(502).json(error);

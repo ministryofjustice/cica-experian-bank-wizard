@@ -6,17 +6,19 @@ const bankWizardService = require('./bankwizard-service');
 
 const router = express.Router();
 
-router.route('/personal').post((req, res, next) => {
+router.route('/personal').post(async (req, res, next) => {
     try {
-        bankWizardService.bankWizardPersonalRequest(req.body, res, next);
+        const response = await bankWizardService.bankWizardRequest(req.body, true);
+        res.status(response.status).json(response.body);
     } catch (err) {
         next(err);
     }
 });
 
-router.route('/company').post((req, res, next) => {
+router.route('/company').post(async (req, res, next) => {
     try {
-        bankWizardService.bankWizardCompanyRequest(req.body, res, next);
+        const response = await bankWizardService.bankWizardRequest(req.body, false);
+        res.status(response.status).json(response.body);
     } catch (err) {
         next(err);
     }

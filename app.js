@@ -85,7 +85,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/docs', docsRouter);
 
 app.use(
-    '/v2/bankwizard',
+    '/api/v2/bankwizard',
     OpenApiValidator.middleware({
         apiSpec: './openapi/openapi.json',
         validateRequests: true,

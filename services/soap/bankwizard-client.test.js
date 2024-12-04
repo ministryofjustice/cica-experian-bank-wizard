@@ -5,8 +5,6 @@
 const personalRequest = require('../../testing/personalRequest');
 const companyRequest = require('../../testing/companyRequest');
 const verifyResponse = require('../../testing/verifyResponse');
-const errorType = require('../../middleware/error-handler/bankwizard-error-type');
-
 const bankwizardClient = require('./bankwizard-client');
 
 const accountInformation = {
@@ -19,18 +17,24 @@ const accountInformation = {
 const address = {
     deliveryPoint: [
         {
-            deliveryType: 'houseNumber',
-            value: '1',
+            attributes: {
+                deliveryType: 'houseNumber',
+            },
+            $value: '1',
         },
     ],
     postalPoint: [
         {
-            postalType: 'street',
-            value: 'Real Road',
+            attributes: {
+                postalType: 'street',
+            },
+            $value: 'Real Road',
         },
         {
-            postalType: 'postcode',
-            value: 'AA1 1AA',
+            attributes: {
+                postalType: 'postcode',
+            },
+            $value: 'AA1 1AA',
         },
     ],
 };
@@ -58,233 +62,107 @@ describe('BankWizard Client', () => {
     jest.mock('soap');
 
     describe('getBranchData()', () => {
-        it('should carry over the access key', () => {
-            const client = {
-                BankWizard_v1_1_Service: {
-                    BankWizard_v1_1_0_Port: {
-                        GetBranchData: (msg, cb) => {
-                            expect(msg.dataAccessKey).toEqual('test-accesskey');
-                        },
-                    },
-                },
-            };
-
-            bankwizardClient.getBranchData(
-                client,
+        it('should return the bank data', async () => {
+            const response = await bankwizardClient.getBranchData(
                 verifyResponse(personalRequest, true),
-                {},
-                () => {},
-                {},
-                () => {},
+                'TestToken',
             );
+
+            expect(response.branchName).toEqual('Test branch');
+            expect(response.institutionName).toEqual('Test institution');
         });
 
-        it('should format the bank data', () => {
-            const client = {
-                BankWizard_v1_1_Service: {
-                    BankWizard_v1_1_0_Port: {
-                        GetBranchData: (msg, cb) => {
-                            const res = {
-                                branchData: [
-                                    {
-                                        institutionName: 'Test institution',
-                                        branchName: 'Test branch',
-                                        address: {
-                                            addressLine: [],
-                                            postOrZipCode: 'AA1 1AA',
-                                        },
-                                        telephoneNumber: '07123456789',
-                                        faxNumber: '123-456-7890',
-                                        closureDate: '2000-01-01',
-                                    },
-                                ],
-                            };
-                            cb(null, res);
-                        },
-                    },
-                },
-            };
-
-            bankwizardClient.getBranchData(
-                client,
-                verifyResponse(personalRequest, true),
-                {},
-                (responseBody, res, verifyResult, next) => {
-                    expect(responseBody.branchName).toEqual('Test branch');
-                    expect(responseBody.bankName).toEqual('Test institution');
-                },
-                null,
-                (err) => {
-                    throw err;
-                },
+        it('should set the correct response when there is no branch data', async () => {
+            const response = await bankwizardClient.getBranchData(
+                verifyResponse(companyRequest, false, [], true, true),
+                'TestToken',
             );
-        });
-
-        it('should set the correct response when there is no branch data', () => {
-            const client = {
-                BankWizard_v1_1_Service: {
-                    BankWizard_v1_1_0_Port: {
-                        GetBranchData: (msg, cb) => {
-                            const res = {
-                                branchData: [],
-                            };
-                            cb(null, res);
-                        },
-                    },
-                },
-            };
-            bankwizardClient.getBranchData(
-                client,
-                verifyResponse(companyRequest, false),
-                {},
-                (responseBody, res, verifyResult, next) => {
-                    expect(responseBody.branchName).toEqual('No data available');
-                    expect(responseBody.bankName).toEqual('No data available');
-                    expect(responseBody.error).toEqual(
-                        'No branch or bank data could be retrieved for this account',
-                    );
-                    expect(responseBody.errorType).toEqual(errorType.NO_BRANCH_DATA);
-                },
-                null,
-                (err) => {
-                    throw err;
-                },
-            );
+            expect(response).toEqual(null);
         });
     });
 
     describe('submitRequest()', () => {
-        it('should correctly format account information from a request', () => {
-            const cb = (msg, res, client, next) => {
-                expect(msg.accountInformation).toEqual(accountInformation);
-            };
-
-            bankwizardClient.submitRequest(
+        it('should correctly format account information from a request', async () => {
+            const response = await bankwizardClient.submitRequest(
                 personalRequest,
-                {},
-                cb,
-                (err) => {
-                    throw err;
-                },
                 true,
+                'TestToken',
             );
+
+            expect(response['ns1:accountInformation']).toEqual(accountInformation);
         });
 
-        it('should correctly format personal information from a request', () => {
-            const cb = (msg, res, client, next) => {
-                expect(msg.personalInformation).toEqual(personalInformation);
-            };
-
-            bankwizardClient.submitRequest(
+        it('should correctly format personal information from a request', async () => {
+            const response = await bankwizardClient.submitRequest(
                 personalRequest,
-                {},
-                cb,
-                (err) => {
-                    throw err;
-                },
                 true,
+                'TestToken',
             );
+
+            expect(response['ns1:personalInformation']).toEqual(personalInformation);
         });
 
-        it('should correctly format company information from a request', () => {
-            const cb = (msg, res, client, next) => {
-                expect(msg.companyInformation).toEqual(companyInformation);
-            };
-
-            bankwizardClient.submitRequest(
+        it('should correctly format company information from a request', async () => {
+            const response = await bankwizardClient.submitRequest(
                 companyRequest,
-                {},
-                cb,
-                (err) => {
-                    throw err;
-                },
                 false,
+                'TestToken',
             );
+
+            expect(response['ns1:companyInformation']).toEqual(companyInformation);
         });
 
-        it('should not include company information in a personal request', () => {
+        it('should not include company information in a personal request', async () => {
+            const req = personalRequest;
+            req.companyName = companyRequest.companyName;
+            const response = await bankwizardClient.submitRequest(req, true, 'TestToken');
+            expect(response['ns1:companyInformation']).toBeUndefined();
+        });
+
+        it('should not include personal information in a company request', async () => {
             const req = personalRequest;
             req.companyName = companyRequest.companyName;
 
-            const cb = (msg, res, client, next) => {
-                expect(msg.companyInformation).toBeUndefined();
-            };
-
-            bankwizardClient.submitRequest(
-                req,
-                {},
-                cb,
-                (err) => {
-                    throw err;
-                },
-                true,
-            );
-        });
-
-        it('should not include personal information in a company request', () => {
-            const req = personalRequest;
-            req.companyName = companyRequest.companyName;
-
-            const cb = (msg, res, client, next) => {
-                expect(msg.personalInformation).toBeUndefined();
-            };
-
-            bankwizardClient.submitRequest(
-                req,
-                {},
-                cb,
-                (err) => {
-                    throw err;
-                },
+            const result = await bankwizardClient.submitRequest(
+                personalRequest,
                 false,
+                'TestToken',
             );
+            expect(result['ns1:personalInformation']).toBeUndefined();
         });
     });
 
-    it('should throw an error if only one part of the address is present', () => {
+    it('should throw an error if only one part of the address is present', async () => {
         const req = personalRequest;
         delete req.houseNumber;
-        bankwizardClient.submitRequest(
-            req,
-            {},
-            () => {},
-            (err) => {
-                expect(err.message).toEqual('Invalid address');
-            },
-            true,
-        );
+        let errMessage;
+        try {
+            await bankwizardClient.submitRequest(req, true, 'TestToken');
+        } catch (err) {
+            errMessage = err.message;
+        }
+        expect(errMessage).toEqual('Invalid address');
     });
 
-    it('should not include the address if no parts are present', () => {
+    it('should not include the address if no parts are present', async () => {
         const req = personalRequest;
         delete req.houseNumber;
         delete req.street;
         delete req.postCode;
-        const cb = (msg, res, client, next) => {
-            expect(msg.personalInformation.address).toEqual(null);
-        };
-        bankwizardClient.submitRequest(
-            req,
-            {},
-            cb,
-            (err) => {
-                throw err;
-            },
-            true,
-        );
+
+        const msg = await bankwizardClient.submitRequest(req, true, 'TestToken');
+        expect(msg['ns1:personalInformation'].address).toEqual(null);
     });
 
-    it('should throw an error if the date of birth is incorrectly formatted', () => {
+    it('should throw an error if the date of birth is incorrectly formatted', async () => {
         const req = personalRequest;
         req.dOB = '01-31-2002';
-        bankwizardClient.submitRequest(
-            req,
-            {},
-            () => {},
-            (err) => {
-                expect(err.message).toEqual('Unrecognised date');
-            },
-            true,
-        );
+        let errMessage;
+        try {
+            await bankwizardClient.submitRequest(req, true, 'TestToken');
+        } catch (err) {
+            errMessage = err.message;
+        }
+        expect(errMessage).toEqual('Unrecognised date');
     });
 });

@@ -1,15 +1,19 @@
 'use strict';
 
-function response(req, personal, conditions = [], found = true) {
+function response(req, personal, condition = [], found = true, returnKey = false) {
     const res = {
         accountInformation: {
             sortCode: req.sortCode,
             accountNumber: req.accountNumber,
             rollNumber: req.rollNumber,
-            dataAccessKey: 'test-accesskey',
-            accountVerificationStatus: found ? 'Match' : 'Unable to check',
+            dataAccessKey: returnKey ? 'return-accesskey' : 'test-accesskey',
+            attributes: {
+                accountVerificationStatus: found ? 'Match' : 'Unable to check',
+            },
         },
-        conditions,
+        conditions: {
+            condition,
+        },
     };
     if (personal) {
         res.personalInformation = {

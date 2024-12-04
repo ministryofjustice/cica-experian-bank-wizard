@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable global-require */
 
 'use strict';
@@ -7,182 +8,142 @@ const errorType = require('../middleware/error-handler/bankwizard-error-type');
 const personalRequest = require('../testing/personalRequest');
 const companyRequest = require('../testing/companyRequest');
 const mockVerifyResponse = require('../testing/verifyResponse');
+const getBranchDataResponse = require('../testing/getBranchResponse');
+
+const testToken = 'TestToken';
 
 beforeEach(() => {
     jest.resetModules();
 });
 
 describe('BankWizard service tests', () => {
-    const normalVerifyResponse = jest.fn((req, res, cb, next, personal) => {
-        const response = mockVerifyResponse(req, personal);
-        cb(response, res, undefined, next);
+    const normalVerifyResponse = jest.fn((req, personal, token) =>
+        mockVerifyResponse(req, personal),
+    );
+
+    const errorVerifyResponse = jest.fn((req, personal, token) =>
+        mockVerifyResponse(req, personal, [{attributes: {severity: 'error', code: '1'}}]),
+    );
+
+    const warningVerifyResponse = jest.fn((req, personal, token) =>
+        mockVerifyResponse(req, personal, [{attributes: {severity: 'warning', code: '7'}}]),
+    );
+
+    const notFoundVerifyResponse = jest.fn((req, personal, token) =>
+        mockVerifyResponse(req, personal, [], false),
+    );
+
+    const incompleteVerifyResponse = jest.fn((req, personal, token) => {
+        const res = mockVerifyResponse(req, personal);
+        if (personal) {
+            res.personalInformation.personalDetailsScore = 'aaa';
+        } else {
+            res.companyInformation.companyNameScore = 'aaaa';
+        }
+        return res;
     });
 
-    const errorVerifyResponse = jest.fn((req, res, cb, next, personal) => {
-        const response = mockVerifyResponse(req, personal, [{severity: 'error', code: '1'}]);
-        cb(response, res, undefined, next);
-    });
-
-    const warningVerifyResponse = jest.fn((req, res, cb, next, personal) => {
-        const response = mockVerifyResponse(req, personal, [{severity: 'warning', code: '7'}]);
-        cb(response, res, undefined, next);
-    });
-
-    const notFoundVerifyResponse = jest.fn((req, res, cb, next, personal) => {
-        const response = mockVerifyResponse(req, personal, [], false);
-        cb(response, res, undefined, next);
-    });
+    const getBranchData = jest.fn((verifyResult, token) => getBranchDataResponse.branchData[0]);
 
     jest.mock('../services/soap/bankwizard-client', () => ({
         submitRequest: jest.fn(),
-        // eslint-disable-next-line no-unused-vars
-        getBranchData: jest.fn((client, verifyResult, responseBody, cb, res, next) => {
-            responseBody.branchName = 'Test branch';
-            responseBody.bankName = 'Test bank';
-            cb(responseBody, res, verifyResult, next);
-        }),
+        getBranchData: jest.fn(),
+    }));
+
+    jest.mock('../services/soap/token-client', () => ({
+        getToken: jest.fn(() => 'TestToken'),
     }));
 
     const bankWizardService = require('./bankwizard-service');
     const bankWizardClient = require('../services/soap/bankwizard-client');
 
-    it('should validate valid accounts', () => {
+    it('should validate valid accounts', async () => {
         bankWizardClient.submitRequest.mockImplementation(normalVerifyResponse);
-        const res = {
-            status: (code) => ({
-                json: (msg) => {
-                    expect(code).toEqual(200);
-                    expect(msg.validateScore).toEqual(true);
-                },
-            }),
-        };
-        bankWizardService.bankWizardPersonalRequest(personalRequest, res, (err) => {
-            throw err;
-        });
+
+        const response = await bankWizardService.bankWizardRequest(personalRequest, true);
+        expect(response.status).toEqual(200);
+        expect(response.body.validateScore).toEqual(true);
     });
 
-    it('should extract scores for personal requests', () => {
+    it('should extract scores for personal requests', async () => {
         bankWizardClient.submitRequest.mockImplementation(normalVerifyResponse);
-        const res = {
-            status: (code) => ({
-                json: (msg) => {
-                    expect(code).toEqual(200);
-                    expect(msg.personalScore).toEqual(1);
-                    expect(msg.addressScore).toEqual(2);
-                },
-            }),
-        };
-        bankWizardService.bankWizardPersonalRequest(personalRequest, res, (err) => {
-            throw err;
-        });
+
+        const response = await bankWizardService.bankWizardRequest(personalRequest, true);
+        expect(response.status).toEqual(200);
+        expect(response.body.personalScore).toEqual(1);
+        expect(response.body.addressScore).toEqual(2);
     });
 
-    it('should extract scores for company requests', () => {
+    it('should extract scores for company requests', async () => {
         bankWizardClient.submitRequest.mockImplementation(normalVerifyResponse);
-        const res = {
-            status: (code) => ({
-                json: (msg) => {
-                    expect(code).toEqual(200);
-                    expect(msg.companyScore).toEqual(1);
-                    expect(msg.addressScore).toEqual(2);
-                },
-            }),
-        };
-        bankWizardService.bankWizardCompanyRequest(companyRequest, res, (err) => {
-            throw err;
-        });
+
+        const response = await bankWizardService.bankWizardRequest(companyRequest, false);
+        expect(response.status).toEqual(200);
+        expect(response.body.companyScore).toEqual(1);
+        expect(response.body.addressScore).toEqual(2);
     });
 
-    it('should include branch data', () => {
+    it('should include branch data', async () => {
         bankWizardClient.submitRequest.mockImplementation(normalVerifyResponse);
-        const res = {
-            status: (code) => ({
-                json: (msg) => {
-                    expect(code).toEqual(200);
-                    expect(msg.bankName).toEqual('Test bank');
-                    expect(msg.branchName).toEqual('Test branch');
-                },
-            }),
-        };
-        bankWizardService.bankWizardPersonalRequest(personalRequest, res, (err) => {
-            throw err;
-        });
+        bankWizardClient.getBranchData.mockImplementation(getBranchData);
+
+        const response = await bankWizardService.bankWizardRequest(personalRequest, true);
+        expect(response.status).toEqual(200);
+        expect(response.body.bankName).toEqual('Test institution');
+        expect(response.body.branchName).toEqual('Test branch');
     });
 
-    it('should include an error message and type when Experian gives back an error condition', () => {
+    it('should include an error message and type when Experian gives back an error condition', async () => {
         bankWizardClient.submitRequest.mockImplementation(errorVerifyResponse);
-        const res = {
-            status: (code) => ({
-                json: (msg) => {
-                    expect(code).toEqual(200);
-                    expect(msg.error).toEqual(bankwizardErrors.ERROR[0].msg);
-                    expect(msg.errorType).toEqual(bankwizardErrors.ERROR[0].type);
-                },
-            }),
-        };
-        bankWizardService.bankWizardPersonalRequest(personalRequest, res, (err) => {
-            throw err;
-        });
+
+        const response = await bankWizardService.bankWizardRequest(personalRequest, true);
+        expect(response.status).toEqual(200);
+        expect(response.body.error).toEqual(bankwizardErrors.ERROR[0].msg);
+        expect(response.body.errorType).toEqual(bankwizardErrors.ERROR[0].type);
     });
 
-    it('should include an error message and type when Experian gives back an warning condition', () => {
+    it('should include an error message and type when Experian gives back an warning condition', async () => {
         bankWizardClient.submitRequest.mockImplementation(warningVerifyResponse);
-        const res = {
-            status: (code) => ({
-                json: (msg) => {
-                    expect(code).toEqual(200);
-                    expect(msg.error).toEqual(bankwizardErrors.WARNING[1].msg);
-                    expect(msg.errorType).toEqual(bankwizardErrors.WARNING[1].type);
-                },
-            }),
-        };
-        bankWizardService.bankWizardCompanyRequest(companyRequest, res, (err) => {
-            throw err;
-        });
+
+        const response = await bankWizardService.bankWizardRequest(companyRequest, false);
+        expect(response.status).toEqual(200);
+        expect(response.body.error).toEqual(bankwizardErrors.WARNING[1].msg);
+        expect(response.body.errorType).toEqual(bankwizardErrors.WARNING[1].type);
     });
 
-    it("should include an error message and type when the account isn't in the experian database", () => {
+    it("should include an error message and type when the account isn't in the experian database", async () => {
         bankWizardClient.submitRequest.mockImplementation(notFoundVerifyResponse);
-        const res = {
-            status: (code) => ({
-                json: (msg) => {
-                    expect(code).toEqual(200);
-                    expect(msg.error).toEqual('Unable to verify - not in Experian database');
-                    expect(msg.errorType).toEqual(errorType.VERIFY_ERROR);
-                },
-            }),
-        };
-        bankWizardService.bankWizardPersonalRequest(personalRequest, res, (err) => {
-            throw err;
-        });
+
+        const response = await bankWizardService.bankWizardRequest(personalRequest, true);
+        expect(response.status).toEqual(200);
+        expect(response.body.error).toEqual('Unable to verify - not in Experian database');
+        expect(response.body.errorType).toEqual(errorType.VERIFY_ERROR);
     });
 
-    it("should default scores to 0 when the account isn't found in the Experian database", () => {
+    it("should default scores to 0 when the account isn't found in the Experian database", async () => {
         bankWizardClient.submitRequest.mockImplementation(notFoundVerifyResponse);
-        const personalRes = {
-            status: (code) => ({
-                json: (msg) => {
-                    expect(code).toEqual(200);
-                    expect(msg.personalScore).toEqual(0);
-                    expect(msg.addressScore).toEqual(0);
-                },
-            }),
-        };
-        bankWizardService.bankWizardPersonalRequest(personalRequest, personalRes, (err) => {
-            throw err;
-        });
 
-        const companyRes = {
-            status: (code) => ({
-                json: (msg) => {
-                    expect(code).toEqual(200);
-                    expect(msg.companyScore).toEqual(0);
-                    expect(msg.addressScore).toEqual(0);
-                },
-            }),
-        };
-        bankWizardService.bankWizardCompanyRequest(companyRequest, companyRes, (err) => {
-            throw err;
-        });
+        const personalRes = await bankWizardService.bankWizardRequest(personalRequest, true);
+
+        expect(personalRes.status).toEqual(200);
+        expect(personalRes.body.personalScore).toEqual(0);
+        expect(personalRes.body.addressScore).toEqual(0);
+
+        const companyRes = await bankWizardService.bankWizardRequest(companyRequest, false);
+        expect(companyRes.status).toEqual(200);
+        expect(companyRes.body.companyScore).toEqual(0);
+        expect(companyRes.body.addressScore).toEqual(0);
+    });
+
+    it("should return an error message when the scores can't be parsed correctly", async () => {
+        bankWizardClient.submitRequest.mockImplementation(incompleteVerifyResponse);
+
+        const res = await bankWizardService.bankWizardRequest(personalRequest, true);
+
+        expect(res.status).toEqual(400);
+        expect(res.body.error).toEqual(
+            'Response from Experian did not include expected results/scores.  This is likely due to an invalid request - please check the request data.',
+        );
+        expect(res.body.errorType).toEqual(errorType.PARSE_RESPONSE_ERROR);
     });
 });

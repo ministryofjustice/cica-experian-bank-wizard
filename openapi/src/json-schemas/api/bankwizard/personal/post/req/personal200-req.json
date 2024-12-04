@@ -1,4 +1,5 @@
 {
+    "title": "Personal request",
     "type": "object",
     "additionalProperties": false,
     "required": [

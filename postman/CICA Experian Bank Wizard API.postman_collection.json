@@ -1,0 +1,125 @@
+{
+	"info": {
+		"_postman_id": "de5f8e62-c5a2-4fd1-8d03-d9502e4c6bca",
+		"name": "CICA Experian Bank Wizard API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21776885"
+	},
+	"item": [
+		{
+			"name": "Personal request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.api+json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"dOB\": \"31-02-2002\",\n  \"sortCode\": \"010101\",\n  \"accountNumber\": \"12345678\",\n  \"rollNumber\": \"\",\n  \"houseNumber\": \"1\",\n  \"street\": \"Real Rd\",\n  \"postCode\": \"AA1 1AA\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/v2/bankwizard/personal",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"bankwizard",
+						"personal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Company request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.api+json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"companyName\": \"Company Ltd\",\n    \"sortCode\": \"010101\",\n    \"accountNumber\": \"12345678\",\n    \"rollNumber\": \"\",\n    \"houseNumber\": \"1\",\n    \"street\": \"Real Rd\",\n    \"postCode\": \"AA1 1AA\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/v2/bankwizard/company",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"bankwizard",
+						"company"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/v2/bankwizard/status",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"bankwizard",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "docs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/docs",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"docs"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

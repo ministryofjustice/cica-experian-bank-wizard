@@ -1,20 +1,37 @@
 'use strict';
 
+/* eslint-disable no-unused-vars */
+
+const getBranchDataResponse = require('../testing/getBranchResponse');
+
 const soap = jest.createMockFromModule('soap');
 
-// eslint-disable-next-line no-unused-vars
-function createClient(url, callback, endpoint) {
-    callback(null, {
-        BankWizard_v1_1_Service: {
-            BankWizard_v1_1_0_Port: {
-                Verify: (msg, cb) => {
-                    cb(null, msg);
+function createClientAsync(wsdl, options, endpoint) {
+    if (wsdl.includes('Token')) {
+        return {
+            LoginWithCertificateAsync: async (msg) => [
+                {
+                    LoginWithCertificateResult: 'SOAPToken',
                 },
+            ],
+            setSecurity: (security) => {},
+        };
+    }
+    if (wsdl.includes('BankWizard')) {
+        return {
+            VerifyAsync: async (msg) => [msg],
+            GetBranchDataAsync: async (msg) => {
+                if (msg['ns1:dataAccessKey'] === 'return-accesskey') {
+                    return [msg];
+                }
+                return [getBranchDataResponse];
             },
-        },
-    });
+            addSoapHeader: (header) => {},
+        };
+    }
+    return null;
 }
 
-soap.createClient = createClient;
+soap.createClientAsync = createClientAsync;
 
 module.exports = soap;

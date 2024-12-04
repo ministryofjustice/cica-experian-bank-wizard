@@ -15,7 +15,7 @@
     },
     "servers": [
         {
-            "url": "/v2/bankwizard"
+            "url": "/api/v2/bankwizard"
         }
     ],
     "tags": [

@@ -1,4 +1,5 @@
 {
+    "title": "Company request",
     "type": "object",
     "additionalProperties": false,
     "required": ["companyName", "sortCode", "accountNumber", "houseNumber", "street", "postCode"],

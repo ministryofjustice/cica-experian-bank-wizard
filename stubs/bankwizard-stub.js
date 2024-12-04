@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 
 'use strict';
@@ -5,6 +6,8 @@
 const soap = require('soap');
 const fs = require('fs');
 const http = require('http');
+
+const getBranchDataResponse = require('../testing/getBranchResponse');
 
 const wsdl = fs.readFileSync('./BankWizardService-v1.wsdl', 'utf8');
 
@@ -15,21 +18,7 @@ const server = http.createServer((req, res) => {
 server.listen(8000);
 
 function GetBranchData(args, cb, headers, req) {
-    return {
-        branchData: [
-            {
-                institutionName: 'Test institution',
-                branchName: 'Test branch',
-                address: {
-                    addressLine: [],
-                    postOrZipCode: 'AA1 1AA',
-                },
-                telephoneNumber: '07123456789',
-                faxNumber: '123-456-7890',
-                closureDate: '2000-01-01',
-            },
-        ],
-    };
+    return getBranchDataResponse;
 }
 
 function Verify(args, cb, headers, req) {
@@ -41,12 +30,16 @@ function Verify(args, cb, headers, req) {
             dataAccessKey: 'stub-accesskey',
             accountVerificationStatus: 'Match',
         },
-        conditions: [
-            {
-                severity: 'fake',
-                code: 999,
-            },
-        ],
+        conditions: {
+            condition: [
+                {
+                    attributes: {
+                        severity: 'fake',
+                        code: 999,
+                    },
+                },
+            ],
+        },
     };
     if (args.personalInformation) {
         // If the first name in the request is error or warning followed by a number
@@ -55,7 +48,7 @@ function Verify(args, cb, headers, req) {
             args.personalInformation.personal.firstName.startsWith('error ') ||
             args.personalInformation.personal.firstName.startsWith('warning ')
         ) {
-            res.conditions.push({
+            res.conditions.condition.push({
                 severity: args.personalInformation.firstname.split(' ')[0],
                 code: args.personalInformation.firstname.split(' ')[1],
             });
@@ -72,7 +65,7 @@ function Verify(args, cb, headers, req) {
             args.companyInformation.companyName.startsWith('error ') ||
             args.companyInformation.companyName.startsWith('warning ')
         ) {
-            res.conditions.push({
+            res.conditions.condition.push({
                 severity: args.companyInformation.companyName.split(' ')[0],
                 code: args.companyInformation.companyName.split(' ')[1],
             });
