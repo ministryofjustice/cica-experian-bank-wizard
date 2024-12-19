@@ -1,0 +1,221 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@4.0.0
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_NAME: cica-maintenance-page
+    docker:
+      # Image tool container
+      - image: ministryofjustice/cloud-platform-tools
+jobs:
+  build:
+    docker:
+      - image: 'cimg/ruby:3.1.3-node'
+    steps:
+      - checkout
+      - setup_remote_docker
+      - aws-cli/setup:
+          role_arn: $ECR_ROLE_TO_ASSUME # this will use the env var
+          region: $ECR_REGION # this will use the env var
+      - run: &ecr_login
+          name: Login to ecr
+          command: |
+            aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin ${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
+            aws configure export-credentials --format env
+      - run: |
+          cp $BASH_ENV bash.env
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bash.env
+      - run:
+          name: Build docker image
+          command: |
+            docker build --no-cache -t cica/cica-repo-dev .
+      - run:
+          name: Archive Docker Image
+          command: |
+            docker save -o image.tar cica/cica-repo-dev:latest
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+  publish_latest:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Test the container
+          command: |
+            docker run -d -p 3001:3001 --restart=always --name cica-maintenance-page cica/cica-repo-dev:latest
+            docker ps
+            docker stop cica-maintenance-page
+            docker ps
+  push_image:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - aws-cli/setup:
+          role_arn: $ECR_ROLE_TO_ASSUME
+          region: $ECR_REGION
+      - run:
+          name: Authenticate and push image to ecr
+          command: |
+            echo "run aws"
+            aws ecr get-login-password --region ${ECR_REGION} | docker login --username AWS --password-stdin  ${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
+            docker tag ${ECR_REPOSITORY}:latest ${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1}
+            docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1}
+  deploy_to_dev:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Authenticate with cluster
+          command: |
+            echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./live_ca.crt --server=https://${K8S_CLUSTER_NAME}
+            kubectl config set-credentials circleci --token=${K8S_TOKEN_DEV}
+            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=claim-criminal-injuries-compensation-dev
+            kubectl config use-context ${K8S_CLUSTER_NAME}
+            kubectl config current-context
+            kubectl --namespace=claim-criminal-injuries-compensation-dev get pods
+      - deploy:
+          name: Deploy to the cluster
+          command: |
+            echo "deploy before aws ecr"
+            kubectl set image -f kube_deploy/maintenance-deploy.yaml cica-maintenance-page=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
+            | kubectl apply -f -
+            kubectl apply \
+                -f kube_deploy/maintenance-service.yaml \
+  deploy_to_uat:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Authenticate with cluster
+          command: |
+            echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./live_ca.crt --server=https://${K8S_CLUSTER_NAME}
+            kubectl config set-credentials circleci --token=${K8S_TOKEN_UAT}
+            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=claim-criminal-injuries-compensation-uat
+            kubectl config use-context ${K8S_CLUSTER_NAME}
+            kubectl config current-context
+            kubectl --namespace=claim-criminal-injuries-compensation-uat get pods
+      - deploy:
+          name: Deploy to the cluster
+          command: |
+            echo "deploy before aws ecr"
+            kubectl set image -f kube_deploy/maintenance-deploy.yaml cica-maintenance-page=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
+            | kubectl apply -f -
+            kubectl apply \
+                -f kube_deploy/maintenance-service.yaml \
+  deploy_to_prod:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Authenticate with cluster
+          command: |
+            echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./live_ca.crt --server=https://${K8S_CLUSTER_NAME}
+            kubectl config set-credentials circleci --token=${K8S_TOKEN_PROD}
+            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=claim-criminal-injuries-compensation-prod
+            kubectl config use-context ${K8S_CLUSTER_NAME}
+            kubectl config current-context
+            kubectl --namespace=claim-criminal-injuries-compensation-prod get pods
+      - deploy:
+          name: Deploy to the cluster
+          command: |
+            echo "deploy before aws ecr"
+            kubectl set image -f kube_deploy/maintenance-deploy.yaml cica-maintenance-page=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
+            | kubectl apply -f -
+            kubectl apply \
+                -f kube_deploy/maintenance-service.yaml \
+  deploy_to_staging:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Authenticate with cluster
+          command: |
+            echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./live_ca.crt
+            kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./live_ca.crt --server=https://${K8S_CLUSTER_NAME}
+            kubectl config set-credentials circleci --token=${K8S_TOKEN_STAG}
+            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=claim-criminal-injuries-compensation-stag
+            kubectl config use-context ${K8S_CLUSTER_NAME}
+            kubectl config current-context
+            kubectl --namespace=claim-criminal-injuries-compensation-stag get pods
+      - deploy:
+          name: Deploy to the cluster
+          command: |
+            echo "deploy before aws ecr"
+            kubectl set image -f kube_deploy/maintenance-deploy.yaml cica-maintenance-page=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
+            | kubectl apply -f -
+            kubectl apply \
+                -f kube_deploy/maintenance-service.yaml \
+workflows:
+  version: 2
+  build-test-push-deploytouatapproval-deployuat-deploytoprodapproval-deployprod:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - main
+      - publish_latest:
+          requires:
+            - build
+      - push_image:
+          requires:
+            - publish_latest
+      - deploy_to_uat_approval:
+          type: approval
+          requires:
+            - push_image
+      - deploy_to_uat:
+          requires:
+            - deploy_to_uat_approval
+      - deploy_to_dev_approval:
+          type: approval
+          requires:
+            - push_image
+      - deploy_to_dev:
+          requires:
+            - deploy_to_dev_approval
+      - deploy_to_prod_approval:
+          type: approval
+          requires:
+            - push_image
+      - deploy_to_prod:
+          requires:
+            - deploy_to_prod_approval
+      - deploy_to_staging_approval:
+          type: approval
+          requires:
+            - push_image
+      - deploy_to_staging:
+          requires:
+            - deploy_to_staging_approval
