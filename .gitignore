@@ -71,3 +71,9 @@ typings/
 .config
 
 openapi/openapi.json
+
+# certificates and wsdl files
+ssl/
+xsd/
+
+*.wsdl

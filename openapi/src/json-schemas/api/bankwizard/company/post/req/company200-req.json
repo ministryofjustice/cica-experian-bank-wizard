@@ -1,0 +1,29 @@
+{
+    "title": "Company request",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["companyName", "sortCode", "accountNumber", "houseNumber", "street", "postCode"],
+    "properties": {
+        "companyName": {
+            "$ref": "../../../../../models/definitions/non-empty-string.json"
+        },
+        "sortCode": {
+            "$ref": "../../../../../models/definitions/sort-code.json"
+        },
+        "accountNumber": {
+            "$ref": "../../../../../models/definitions/account-number.json"
+        },
+        "rollNumber": {
+            "type": "string"
+        },
+        "houseNumber": {
+            "type": "string"
+        },
+        "street": {
+            "type": "string"
+        },
+        "postCode": {
+            "$ref": "../../../../../models/definitions/post-code.json"
+        }
+    }
+}

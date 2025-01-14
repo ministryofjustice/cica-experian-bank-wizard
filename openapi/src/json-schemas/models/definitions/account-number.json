@@ -1,0 +1,5 @@
+{
+    "title": "account-number",
+    "type": "string",
+    "pattern": "^[0-9]{7,8}$"
+}

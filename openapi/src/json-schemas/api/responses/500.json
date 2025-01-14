@@ -3,10 +3,10 @@
     "required": ["error", "errorType"],
     "properties": {
         "error": {
-            "type": "string"
+            "enum": ["500 Internal Server Error"]
         },
         "errorType": {
-            "enum": ["invalidRequestError"]
+            "enum": ["fatal"]
         }
     }
 }
