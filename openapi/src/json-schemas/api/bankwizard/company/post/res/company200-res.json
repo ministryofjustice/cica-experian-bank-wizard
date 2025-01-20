@@ -1,0 +1,21 @@
+{
+    "title": "Company request response",
+    "required": ["validateScore", "branchName", "bankName", "companyScore"],
+    "properties": {
+        "validateScore": {
+            "type": "boolean"
+        },
+        "branchName": {
+            "type": "string"
+        },
+        "bankName": {
+            "type": "string"
+        },
+        "companyScore": {
+            "$ref": "../../../../../models/definitions/digit.json"
+        },
+        "addressScore": {
+            "$ref": "../../../../../models/definitions/digit.json"
+        }
+    }
+}

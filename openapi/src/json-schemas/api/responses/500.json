@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "required": ["error", "errorType"],
+    "properties": {
+        "error": {
+            "enum": ["500 Internal Server Error"]
+        },
+        "errorType": {
+            "enum": ["fatal"]
+        }
+    }
+}

@@ -1,0 +1,5 @@
+{
+    "title": "Section",
+    "type": "object",
+    "required": ["$schema"]
+}

@@ -1,0 +1,22 @@
+{
+    "ignoreRoot": [
+        ".git",
+        ".nyc_output",
+        ".sass-cache",
+        "bower_components",
+        "coverage",
+        "./node_modules/!(q-templates-application)/dist/template.json"
+    ],
+    "watch": [
+        "node_modules/q-templates-application/dist/template.json",
+        "db",
+        "docs",
+        "middleware",
+        "openapi",
+        "public",
+        "bankwizard",
+        "services",
+        "stubs",
+        "app.js"
+    ]
+}

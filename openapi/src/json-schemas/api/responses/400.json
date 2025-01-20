@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "required": ["error", "errorType"],
+    "properties": {
+        "error": {
+            "type": "string"
+        },
+        "errorType": {
+            "enum": ["invalidRequestError"]
+        }
+    }
+}

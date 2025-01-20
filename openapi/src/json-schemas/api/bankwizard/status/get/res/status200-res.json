@@ -1,0 +1,9 @@
+{
+    "title": "Status request response",
+    "required": ["status"],
+    "properties": {
+        "status": {
+            "type": "string"
+        }
+    }
+}

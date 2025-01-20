@@ -1,0 +1,189 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "CICA Experian BankWizard Integration Service",
+        "description": "Handle BankWizard requests",
+        "version": "0.0.1",
+        "license": {
+            "name": "MIT",
+            "url": "https://mit-license.org/"
+        },
+        "contact": {
+            "name": "API Support",
+            "email": "api@cica.gov.uk"
+        }
+    },
+    "servers": [
+        {
+            "url": "/api/v2/bankwizard"
+        }
+    ],
+    "tags": [
+        {
+            "name": "BankWizard",
+            "description": "Submit requests to Experian"
+        }
+    ],
+    "paths": {
+        "/personal": {
+            "post": {
+                "tags": ["BankWizard"],
+                "summary": "Submit a personal type request",
+                "description": "Submit a personal type request to the Experian BankWizard service",
+                "operationId": "personal",
+                "requestBody": {
+                    "description": "Personal request template",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "./json-schemas/api/bankwizard/personal/post/req/personal200-req.json"
+                            },
+                            "example": {
+                                "firstName": "John",
+                                "lastName": "Doe",
+                                "dOB": "31-01-2000",
+                                "sortCode": "01-01-01",
+                                "accountNumber": "12345678",
+                                "rollNumber": "",
+                                "houseNumber": "1",
+                                "street": "Real Road",
+                                "postCode": "AA1 1AA"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "./json-schemas/api/bankwizard/personal/post/res/personal200-res.json"
+                                },
+                                "example": {
+                                    "validateScore": true,
+                                    "branchName": "Test branch",
+                                    "bankName": "Test institution",
+                                    "personalScore": 1,
+                                    "addressScore": 2
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                }
+            }
+        },
+        "/company": {
+            "post": {
+                "tags": ["BankWizard"],
+                "summary": "Submit a company type request",
+                "description": "Submit a company type request to the Experian BankWizard service",
+                "operationId": "company",
+                "requestBody": {
+                    "description": "Company request template",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "./json-schemas/api/bankwizard/company/post/req/company200-req.json"
+                            },
+                            "example": {
+                                "companyName": "My Company Ltd.",
+                                "sortCode": "01-01-01",
+                                "accountNumber": "12345678",
+                                "rollNumber": "",
+                                "houseNumber": "1",
+                                "street": "Real Road",
+                                "postCode": "AA1 1AA"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "./json-schemas/api/bankwizard/company/post/res/company200-res.json"
+                                },
+                                "example": {
+                                    "validateScore": true,
+                                    "branchName": "Test branch",
+                                    "bankName": "Test institution",
+                                    "companyScore": 1
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                }
+            }
+        },
+        "/status": {
+            "get": {
+                "tags": ["BankWizard"],
+                "summary": "Status check",
+                "description": "Returns a status 200 if the service is currently running",
+                "operationId": "status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "./json-schemas/api/bankwizard/status/get/res/status200-res.json"
+                                },
+                                "example": {
+                                    "status": "Service up"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "responses": {
+            "BadRequest": {
+                "description": "There is an issue with the request",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "./json-schemas/api/responses/400.json"
+                        },
+                        "example": {
+                            "error": "400 Bad Request",
+                            "errorType": "invalidRequestError"
+                        }
+                    }
+                }
+            },
+            "InternalServerError": {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "./json-schemas/api/responses/500.json"
+                        },
+                        "example": {
+                            "error": "500 Internal Server Error",
+                            "errorType": "fatal"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "security": []
+}
