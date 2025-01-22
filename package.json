@@ -11,7 +11,7 @@
         "start:stub": "npm run start:dev & npm run stub",
         "openapi:build": "redocly lint openapi/src/openapi-src.json && redocly bundle ./openapi/src/openapi-src.json --output ./openapi/openapi.json && node ./openapi/src/dereference-openapi.js",
         "build:run:dev": "npm run openapi:build && node --inspect=0.0.0.0:9229 ./bin/www",
-        "prepare": "npm run openapi:build && husky install",
+        "prepare": "npm run openapi:build && husky",
         "pretest": "npm run openapi:build",
         "test": "jest",
         "coverage": "jest --coverage",
@@ -21,10 +21,11 @@
         "lint:fix": "eslint --fix ."
     },
     "dependencies": {
-        "cookie-parser": "~1.4.7",
-        "dotenv": "^16.4.7",
         "@eslint/eslintrc": "^3.2.0",
         "@eslint/js": "^9.18.0",
+        "@redocly/cli": "^1.27.2",
+        "cookie-parser": "~1.4.7",
+        "dotenv": "^16.4.7",
         "eslint-plugin-fp": "^2.3.0",
         "eslint-plugin-prettier": "^5.2.3",
         "express": "^4.21.2",
@@ -37,7 +38,6 @@
     },
     "devDependencies": {
         "@apidevtools/json-schema-ref-parser": "^11.7.3",
-        "@redocly/cli": "^1.27.2",
         "eslint": "^9.18.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^10.0.1",
