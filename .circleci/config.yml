@@ -8,17 +8,63 @@ orbs:
 executors:
   docker-publisher:
     environment:
-      IMAGE_NAME: cica-maintenance-page
+      IMAGE_NAME: cica-repo-dev
     docker:
       # Image tool container
       - image: ministryofjustice/cloud-platform-tools
 jobs:
-  build:
+  build-for-test:
     docker:
-      - image: 'cimg/ruby:3.1.3-node'
+      - image: 'node:22.8.0-bookworm-slim'
+    steps:
+      - checkout
+      - run:
+          name: npm audit
+          command: npm audit --production --audit-level=moderate
+      - persist_to_workspace:
+          root: ./
+          paths:
+          - '*'
+      - restore_cache:
+          key: v1-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install npm dependencies
+          command: 'if [ -d node_modules ]; then echo package.json and package-lock.json unchanged. Using node_modules cache.; else npm ci --loglevel warn --yes; fi'
+      - save_cache:
+          key: v1-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+            - ./openapi
+  test:
+    docker:
+      - image: 'node:22.8.0-bookworm-slim'
+    steps:
+      - attach_workspace:
+          at: ./
+      - restore_cache:
+          key: v1-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+      - run:
+          name: Run tests and code coverage
+          command: npx --no-install jest --ci --runInBand --bail --silent --coverage --projects jest.config.js
+  lint:
+    docker:
+      - image: 'node:22.8.0-bookworm-slim'
+    steps:
+      - attach_workspace:
+          at: ./
+      - restore_cache:
+          key: v1-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+      - run:
+          name: Lint codebase
+          command: npx --no-install eslint .
+  build:
+    executor: docker-publisher
     steps:
       - checkout
       - setup_remote_docker
+      - run:
+          name: install packages
+          command: apk add --update-cache --upgrade curl unzip
       - aws-cli/setup:
           role_arn: $ECR_ROLE_TO_ASSUME # this will use the env var
           region: $ECR_REGION # this will use the env var
@@ -26,7 +72,6 @@ jobs:
           name: Login to ecr
           command: |
             aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin ${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
-            aws configure export-credentials --format env
       - run: |
           cp $BASH_ENV bash.env
       - persist_to_workspace:
@@ -57,9 +102,9 @@ jobs:
       - run:
           name: Test the container
           command: |
-            docker run -d -p 3001:3001 --restart=always --name cica-maintenance-page cica/cica-repo-dev:latest
+            docker run -d -p 3001:3001 --restart=always --name cica-repo-dev cica/cica-repo-dev:latest
             docker ps
-            docker stop cica-maintenance-page
+            docker stop cica-repo-dev
             docker ps
   push_image:
     executor: docker-publisher
@@ -100,10 +145,10 @@ jobs:
           name: Deploy to the cluster
           command: |
             echo "deploy before aws ecr"
-            kubectl set image -f kube_deploy/maintenance-deploy.yaml cica-maintenance-page=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
+            kubectl set image -f kube_deploy/Dev/deploy.yaml experian-bankwizard-service=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
             | kubectl apply -f -
             kubectl apply \
-                -f kube_deploy/maintenance-service.yaml \
+                -f kube_deploy/Dev/service.yaml \
   deploy_to_uat:
     executor: docker-publisher
     steps:
@@ -124,10 +169,10 @@ jobs:
           name: Deploy to the cluster
           command: |
             echo "deploy before aws ecr"
-            kubectl set image -f kube_deploy/maintenance-deploy.yaml cica-maintenance-page=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
+            kubectl set image -f kube_deploy/Uat/deploy.yaml experian-bankwizard-service=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
             | kubectl apply -f -
             kubectl apply \
-                -f kube_deploy/maintenance-service.yaml \
+                -f kube_deploy/Uat/service.yaml \
   deploy_to_prod:
     executor: docker-publisher
     steps:
@@ -148,10 +193,10 @@ jobs:
           name: Deploy to the cluster
           command: |
             echo "deploy before aws ecr"
-            kubectl set image -f kube_deploy/maintenance-deploy.yaml cica-maintenance-page=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
+            kubectl set image -f kube_deploy/Prod/deploy.yaml experian-bankwizard-service=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
             | kubectl apply -f -
             kubectl apply \
-                -f kube_deploy/maintenance-service.yaml \
+                -f kube_deploy/Prod/service.yaml \
   deploy_to_staging:
     executor: docker-publisher
     steps:
@@ -172,32 +217,36 @@ jobs:
           name: Deploy to the cluster
           command: |
             echo "deploy before aws ecr"
-            kubectl set image -f kube_deploy/maintenance-deploy.yaml cica-maintenance-page=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
+            kubectl set image -f kube_deploy/Stag/deploy.yaml experian-bankwizard-service=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
             | kubectl apply -f -
             kubectl apply \
-                -f kube_deploy/maintenance-service.yaml \
+                -f kube_deploy/Stag/service.yaml \
 workflows:
   version: 2
   build-test-push-deploytouatapproval-deployuat-deploytoprodapproval-deployprod:
     jobs:
+      - build-for-test
+      - test:
+          requires:
+            - build-for-test
+      - lint:
+          requires:
+            - build-for-test
       - build:
-          filters:
-            branches:
-              only:
-                - main
+          requires:
+            - test
+            - lint
       - publish_latest:
           requires:
             - build
       - push_image:
           requires:
             - publish_latest
-      - deploy_to_uat_approval:
-          type: approval
-          requires:
-            - push_image
-      - deploy_to_uat:
-          requires:
-            - deploy_to_uat_approval
+          filters:
+            branches:
+              only:
+                - experian-bankwizard-deploy
+                - experian-bankwizard-deploy-to-staging
       - deploy_to_dev_approval:
           type: approval
           requires:
@@ -205,6 +254,36 @@ workflows:
       - deploy_to_dev:
           requires:
             - deploy_to_dev_approval
+          filters:
+            branches:
+              only:
+                - experian-bankwizard-deploy
+      - deploy_to_uat_approval:
+          type: approval
+          requires:
+            - deploy_to_dev
+      - deploy_to_uat:
+          requires:
+            - deploy_to_uat_approval
+          filters:
+            branches:
+              only:
+                - experian-bankiwzard-deploy
+      - deploy_to_staging_approval:
+          type: approval
+          requires:
+            - push_image
+          filters:
+            branches:
+              only:
+                - experian-bankwizard-deploy-to-staging
+      - deploy_to_staging:
+          requires:
+            - deploy_to_staging_approval
+          filters:
+            branches:
+              only:
+                - experian-bankwizard-deploy-to-staging
       - deploy_to_prod_approval:
           type: approval
           requires:
@@ -212,10 +291,6 @@ workflows:
       - deploy_to_prod:
           requires:
             - deploy_to_prod_approval
-      - deploy_to_staging_approval:
-          type: approval
-          requires:
-            - push_image
-      - deploy_to_staging:
-          requires:
-            - deploy_to_staging_approval
+          filters:
+            branches:
+              only: experian-bankwizard-deploy
