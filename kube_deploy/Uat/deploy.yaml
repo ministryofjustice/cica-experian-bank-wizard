@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: experian-bankwizard-service-app-uat
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: experian-bankwizard-app-uat
+    spec:
+      serviceAccountName: irsaebs
+      containers:
+        - name: experian-bankwizard-service
+          image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/cica/cica-repo-dev:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3800
+  selector:
+    matchLabels:
+      app: experian-bankwizard-service-app-uat

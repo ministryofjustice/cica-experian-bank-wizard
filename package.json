@@ -11,7 +11,7 @@
         "start:stub": "npm run start:dev & npm run stub",
         "openapi:build": "redocly lint openapi/src/openapi-src.json && redocly bundle ./openapi/src/openapi-src.json --output ./openapi/openapi.json && node ./openapi/src/dereference-openapi.js",
         "build:run:dev": "npm run openapi:build && node --inspect=0.0.0.0:9229 ./bin/www",
-        "prepare": "npm run openapi:build && husky",
+        "prepare": "npm run openapi:build && if [ \"$NODE_ENV\" != \"production\" ]; then husky; fi",
         "pretest": "npm run openapi:build",
         "test": "jest",
         "coverage": "jest --coverage",
@@ -33,6 +33,7 @@
         "globals": "^15.14.0",
         "helmet": "^8.0.0",
         "pino-http": "^10.4.0",
+        "pino-pretty": "^13.0.0",
         "soap": "^1.1.7",
         "swagger-ui-express": "^5.0.1"
     },
@@ -47,7 +48,6 @@
         "husky": "^9.1.7",
         "jest": "^29.7.0",
         "nodemon": "^3.1.9",
-        "pino-pretty": "^13.0.0",
         "prettier": "^3.4.2",
         "supertest": "^7.0.0",
         "yamljs": "^0.3.0"
