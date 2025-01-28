@@ -34,6 +34,7 @@ jobs:
           key: v1-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
+            - ./openapi
   test:
     docker:
       - image: 'node:22.8.0-bookworm-slim'
