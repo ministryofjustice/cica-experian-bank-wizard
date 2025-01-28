@@ -72,7 +72,6 @@ jobs:
           name: Login to ecr
           command: |
             aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin ${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
-            aws configure export-credentials --format env
       - run: |
           cp $BASH_ENV bash.env
       - persist_to_workspace:
