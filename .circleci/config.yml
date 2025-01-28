@@ -58,8 +58,7 @@ jobs:
           name: Lint codebase
           command: npx --no-install eslint .
   build:
-    docker:
-      - image: 'node:22.8.0-bookworm-slim'
+    executor: docker-publisher
     steps:
       - checkout
       - setup_remote_docker
