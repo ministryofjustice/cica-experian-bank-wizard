@@ -65,7 +65,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: install curl
-          command: apt-get update && apt-get install -y curl
+          command: apt-get update && apt-get install -y curl unzip
       - aws-cli/setup:
           role_arn: $ECR_ROLE_TO_ASSUME # this will use the env var
           region: $ECR_REGION # this will use the env var
