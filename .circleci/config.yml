@@ -268,7 +268,7 @@ workflows:
           filters:
             branches:
               only:
-                - experian-bankiwzard-deploy
+                - experian-bankwizard-deploy
       - deploy_to_staging_approval:
           type: approval
           requires:
