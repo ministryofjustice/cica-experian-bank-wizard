@@ -287,7 +287,7 @@ workflows:
       - deploy_to_prod_approval:
           type: approval
           requires:
-            - push_image
+            - deploy_to_uat
       - deploy_to_prod:
           requires:
             - deploy_to_prod_approval
