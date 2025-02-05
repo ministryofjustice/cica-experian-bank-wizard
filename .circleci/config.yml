@@ -8,7 +8,7 @@ orbs:
 executors:
   docker-publisher:
     environment:
-      IMAGE_NAME: cica-repo-dev
+      IMAGE_NAME: cica-experian
     docker:
       # Image tool container
       - image: ministryofjustice/cloud-platform-tools
@@ -81,11 +81,11 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            docker build --no-cache -t cica/cica-repo-dev .
+            docker build --no-cache -t cica/cica-experian .
       - run:
           name: Archive Docker Image
           command: |
-            docker save -o image.tar cica/cica-repo-dev:latest
+            docker save -o image.tar cica/cica-experian:latest
       - persist_to_workspace:
           root: .
           paths:
@@ -102,9 +102,9 @@ jobs:
       - run:
           name: Test the container
           command: |
-            docker run -d -p 3001:3001 --restart=always --name cica-repo-dev cica/cica-repo-dev:latest
+            docker run -d -p 3001:3001 --restart=always --name cica-experian cica/cica-experian:latest
             docker ps
-            docker stop cica-repo-dev
+            docker stop cica-experian
             docker ps
   push_image:
     executor: docker-publisher
