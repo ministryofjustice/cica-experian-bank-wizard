@@ -123,7 +123,7 @@ jobs:
           command: |
             echo "run aws"
             aws ecr get-login-password --region ${ECR_REGION} | docker login --username AWS --password-stdin  ${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
-            docker tag cica-experian:latest ${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1}
+            docker tag cica/cica-experian:latest ${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1}
             docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1}
   deploy_to_dev:
     executor: docker-publisher
