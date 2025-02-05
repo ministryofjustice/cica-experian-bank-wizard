@@ -1,19 +1,20 @@
 'use strict';
 
 const soap = require('soap');
-const fs = require('fs');
 const https = require('https');
-
-const wsdl = './TokenService.wsdl';
+const createS3Service = require('../s3');
 
 const url = process.env.TOKEN_SERVICE_URL;
-const env = process.env.BANKWIZARD_ENV;
-
-const publicCert = `./ssl/experian${env}/publicCert.pem`;
-const privateKey = `./ssl/experian${env}/privateKeyDecrypted.pem`;
-const ca = ['./ssl/ExperianIssueCA.cer', './ssl/ExperianCARootInter.cer'];
+const bucket = process.env.S3_BUCKET;
 
 async function getToken() {
+    const s3Service = createS3Service();
+
+    const wsdl = await s3Service.getFromS3(bucket, 'wsdl/tokenservice.wsdl');
+    const publicCert = await s3Service.getFromS3(bucket, 'ssl/public.pem');
+    const privateKey = await s3Service.getFromS3(bucket, 'ssl/private.pem');
+    const ca = await s3Service.getFromS3(bucket, 'ssl/ca.cer');
+
     const request = {
         application: 'CICA BankWizard Middleware Service',
         checkIP: true,
@@ -26,8 +27,8 @@ async function getToken() {
         {
             wsdl_options: {
                 httpsAgent: new https.Agent({
-                    key: fs.readFileSync(privateKey, 'utf8'),
-                    cert: fs.readFileSync(publicCert, 'utf8'),
+                    key: privateKey,
+                    cert: publicCert,
                     ca,
                 }),
             },
