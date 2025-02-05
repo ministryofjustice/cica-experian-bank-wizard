@@ -7,7 +7,7 @@ spec:
   template:
     metadata:
       labels:
-        app: experian-bankwizard-app-dev
+        app: experian-bankwizard-service-app-dev
     spec:
       serviceAccountName: circleci-experian-dev
       containers:
