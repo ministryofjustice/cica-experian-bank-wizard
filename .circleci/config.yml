@@ -137,10 +137,10 @@ jobs:
             echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./live_ca.crt
             kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./live_ca.crt --server=https://${K8S_CLUSTER_NAME}
             kubectl config set-credentials circleci --token=${K8S_TOKEN_DEV}
-            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=claim-criminal-injuries-compensation-dev
+            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=claim-experian-dev
             kubectl config use-context ${K8S_CLUSTER_NAME}
             kubectl config current-context
-            kubectl --namespace=claim-criminal-injuries-compensation-dev get pods
+            kubectl --namespace=cica-experian-dev get pods
       - deploy:
           name: Deploy to the cluster
           command: |
@@ -161,10 +161,10 @@ jobs:
             echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./live_ca.crt
             kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./live_ca.crt --server=https://${K8S_CLUSTER_NAME}
             kubectl config set-credentials circleci --token=${K8S_TOKEN_UAT}
-            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=claim-criminal-injuries-compensation-uat
+            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=cica-experian-uat
             kubectl config use-context ${K8S_CLUSTER_NAME}
             kubectl config current-context
-            kubectl --namespace=claim-criminal-injuries-compensation-uat get pods
+            kubectl --namespace=cica-experian-uat get pods
       - deploy:
           name: Deploy to the cluster
           command: |
@@ -185,10 +185,10 @@ jobs:
             echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./live_ca.crt
             kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./live_ca.crt --server=https://${K8S_CLUSTER_NAME}
             kubectl config set-credentials circleci --token=${K8S_TOKEN_PROD}
-            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=claim-criminal-injuries-compensation-prod
+            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=cica-experian-prod
             kubectl config use-context ${K8S_CLUSTER_NAME}
             kubectl config current-context
-            kubectl --namespace=claim-criminal-injuries-compensation-prod get pods
+            kubectl --namespace=cica-experian-prod get pods
       - deploy:
           name: Deploy to the cluster
           command: |
@@ -209,10 +209,10 @@ jobs:
             echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./live_ca.crt
             kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./live_ca.crt --server=https://${K8S_CLUSTER_NAME}
             kubectl config set-credentials circleci --token=${K8S_TOKEN_STAG}
-            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=claim-criminal-injuries-compensation-stag
+            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=cica-experian-stag
             kubectl config use-context ${K8S_CLUSTER_NAME}
             kubectl config current-context
-            kubectl --namespace=claim-criminal-injuries-compensation-stag get pods
+            kubectl --namespace=cica-experian-stag get pods
       - deploy:
           name: Deploy to the cluster
           command: |

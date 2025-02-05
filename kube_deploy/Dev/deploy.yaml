@@ -9,7 +9,7 @@ spec:
       labels:
         app: experian-bankwizard-app-dev
     spec:
-      serviceAccountName: irsaebs
+      serviceAccountName: circleci-experian-dev
       containers:
         - name: experian-bankwizard-service
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/cica-ebw/cica-experian:latest
