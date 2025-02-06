@@ -75,7 +75,7 @@ jobs:
       - run:
           name: Download required files from S3
           command: |
-            aws s3 cp s3://${BANKWIZARD_ARTIFACT_BUCKET_NAME}/ . --recursive
+            aws s3 cp s3://${BANKWIZARD_ARTIFACT_BUCKET_NAME}/ . --recursive --region ${ECR_REGION}
       - run: |
           cp $BASH_ENV bash.env
       - persist_to_workspace:
