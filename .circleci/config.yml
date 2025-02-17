@@ -73,7 +73,7 @@ jobs:
           command: |
             aws s3 cp s3://${BANKWIZARD_ARTIFACT_BUCKET_NAME}/ . --recursive --region ${ECR_REGION}
       - aws-cli/setup:
-          role_arn: $S3_ROLE_TO_ASSUME # this will use the env var
+          role_arn: $ECR_ROLE_TO_ASSUME # this will use the env var
           region: $ECR_REGION # this will use the env var    
       - run: &ecr_login
           name: Login to ecr
