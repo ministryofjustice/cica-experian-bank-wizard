@@ -67,7 +67,7 @@ jobs:
           command: apk add --update-cache --upgrade curl unzip
       - aws-cli/setup:
           role_arn: $S3_ROLE_TO_ASSUME # this will use the env var
-          region: $S3_REGION # this will use the env var
+          region: $ECR_REGION # this will use the env var
           profile_name: s3-profile
       - aws-cli/setup:
           role_arn: $ECR_ROLE_TO_ASSUME # this will use the env var
