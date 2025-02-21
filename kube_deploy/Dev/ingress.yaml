@@ -4,7 +4,7 @@ metadata:
   name: cica-ingress-dev
   namespace: cica-experian-dev
   annotations:
-    nginx.ingress.kubernetes.io/whitelist-source-range: 51.149.2.7/32,5.148.17.54/32
+    nginx.ingress.kubernetes.io/whitelist-source-range: 51.149.2.7/32,5.148.17.54/32,213.107.167.128/32
     external-dns.alpha.kubernetes.io/set-identifier: cica-ingress-dev-cica-experian-dev-green
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 spec:
