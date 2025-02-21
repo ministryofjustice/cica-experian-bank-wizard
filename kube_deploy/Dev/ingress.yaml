@@ -22,4 +22,4 @@ spec:
             service:
               name: cica-experian-dev
               port:
-                number: 3800
+                number: 3100

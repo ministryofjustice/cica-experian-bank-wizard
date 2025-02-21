@@ -6,8 +6,8 @@ metadata:
     app: cica-experian-dev
 spec:
   ports:
-    - port: 3800
+    - port: 3100
       name: http
-      targetPort: 3800
+      targetPort: 3100
   selector:
     app: cica-experian-dev

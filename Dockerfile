@@ -20,10 +20,10 @@ ENV NODE_ENV=${NODE_ENV}
 # If you are building your code for production
 RUN npm ci
 
-# Expose port 3800 inside the container to the outside world
-# so that http://localhost:3800 routes the network traffic to
+# Expose port 3100 inside the container to the outside world
+# so that http://localhost:3100 routes the network traffic to
 # the container
-EXPOSE 3800
+EXPOSE 3100
 
 USER 1015
 # the command line to run when the container is started
