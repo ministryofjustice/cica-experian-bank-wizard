@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: cica-experian-dev
   labels:
-    app: cica-experian-app-dev
+    app: cica-experian-dev
 spec:
   ports:
     - port: 80
       name: http
       targetPort: 3800
   selector:
-    app: cica-experian-app-dev
+    app: cica-experian-dev
