@@ -1,11 +1,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: bankwizard-ingress
+  name: ebw-ingress-dev
   namespace: cica-experian-dev
   annotations:
     nginx.ingress.kubernetes.io/whitelist-source-range: 51.149.2.7/32,5.148.17.54/32
-    external-dns.alpha.kubernetes.io/set-identifier: bankwizard-ingress-cica-experian-dev-green
+    external-dns.alpha.kubernetes.io/set-identifier: ebw-ingress-cica-experian-dev-green
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 spec:
   ingressClassName: default
@@ -20,6 +20,6 @@ spec:
           pathType: ImplementationSpecific
           backend:
             service:
-              name: experian-bankwizard-service-dev
+              name: ebw-service-dev
               port:
                 number: 80
