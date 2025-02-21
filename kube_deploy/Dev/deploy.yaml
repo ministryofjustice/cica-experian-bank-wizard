@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ebw-app-dev
+  name: cica-experian-app-dev
 spec:
   replicas: 2
   template:
     metadata:
       labels:
-        app: ebw-app-dev
+        app: cica-experian-app-dev
     spec:
       serviceAccountName: circleci-experian-dev
       containers:
@@ -18,4 +18,4 @@ spec:
             - containerPort: 3800
   selector:
     matchLabels:
-      app: ebw-app-dev
+      app: cica-experian-app-dev

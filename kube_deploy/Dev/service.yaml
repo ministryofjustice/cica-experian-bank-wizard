@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ebw-service-dev
+  name: cica-experian-dev
   labels:
-    app: ebw-app-dev
+    app: cica-experian-app-dev
 spec:
   ports:
     - port: 80
       name: http
       targetPort: 3800
   selector:
-    app: ebw-app-dev
+    app: cica-experian-app-dev

@@ -11,15 +11,15 @@ spec:
   ingressClassName: default
   tls:
     - hosts:
-        - cica-experian.dev.apps.live.cloud-platform.service.justice.gov.uk
+        - cica-experian-dev.apps.live.cloud-platform.service.justice.gov.uk
   rules:
-    - host: cica-experian.dev.apps.live.cloud-platform.service.justice.gov.uk
+    - host: cica-experian-dev.apps.live.cloud-platform.service.justice.gov.uk
     - http:
         paths:
         - path: /
           pathType: ImplementationSpecific
           backend:
             service:
-              name: ebw-service-dev
+              name: cica-experian-dev
               port:
                 number: 80
