@@ -91,6 +91,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
+            ls
             docker build --no-cache -t cica/cica-experian .
       - run:
           name: Archive Docker Image
