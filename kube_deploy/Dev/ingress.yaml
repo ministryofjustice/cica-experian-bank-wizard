@@ -11,9 +11,9 @@ spec:
   ingressClassName: default
   tls:
     - hosts:
-        - experian-bankwizard-service.dev.cica-experian-dev.apps.live.cloud-platform.service.justice.gov.uk
+        - cica-experian-dev.apps.live.cloud-platform.service.justice.gov.uk
   rules:
-    - host: experian-bankwizard-service.dev.cica-experian-dev.apps.live.cloud-platform.service.justice.gov.uk
+    - host: cica-experian-dev.apps.live.cloud-platform.service.justice.gov.uk
     - http:
         paths:
         - path: /
