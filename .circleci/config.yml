@@ -76,6 +76,8 @@ jobs:
           name: Download required files from S3
           command: |
             aws s3 cp s3://${BANKWIZARD_ARTIFACT_BUCKET_NAME}/ $CIRCLE_WORKING_DIRECTORY/. --recursive --region ${ECR_REGION} --profile s3-profile
+            pwd
+            ls
       - run: &ecr_login
           name: Login to ecr
           command: |
