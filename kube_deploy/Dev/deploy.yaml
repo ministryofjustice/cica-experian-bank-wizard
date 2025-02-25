@@ -16,6 +16,21 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3100
+          env:
+            - name: BANKWIZARD_URL
+              valueFrom:
+                secretKeyRef:
+                  name: experian-bankwizard-secrets
+                  key: bankwizard_url
+            - name: TOKEN_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: experian-bankwizard-secrets
+                  key: token_service_url
+            - name: NODE_ENV
+              value: development
+            - name: BANKWIZARD_ENV
+              value: prod
   selector:
     matchLabels:
       app: cica-experian-dev
