@@ -21,12 +21,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: experian-bankwizard-secrets
-                  key: bankwizard_url
+                  key: bankwizard_url_prod
             - name: TOKEN_SERVICE_URL
               valueFrom:
                 secretKeyRef:
                   name: experian-bankwizard-secrets
-                  key: token_service_url
+                  key: token_service_url_prod
             - name: NODE_ENV
               value: development
             - name: BANKWIZARD_ENV
