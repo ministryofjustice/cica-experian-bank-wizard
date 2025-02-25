@@ -15,10 +15,7 @@ spec:
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/cica-ebw/cica-experian:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
-          env:
-            - name: APP_ENV
-              value: dev
+            - containerPort: 3100
   selector:
     matchLabels:
       app: cica-experian-dev
