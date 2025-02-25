@@ -16,6 +16,9 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3100
+          env:
+            - name: APP_ENV
+              value: dev
   selector:
     matchLabels:
       app: cica-experian-dev

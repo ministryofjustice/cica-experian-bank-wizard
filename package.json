@@ -1,5 +1,5 @@
 {
-    "name": "test",
+    "name": "experian-bankwizard-service",
     "version": "0.0.2",
     "engines": {
         "npm": ">=9.5.0",
