@@ -21,6 +21,6 @@
 !bankwizard
 !services
 !public
-!wsdl
-
-
+!*.wsdl
+!ssl
+!xsd

@@ -6,6 +6,7 @@ beforeEach(() => {
 
 describe('Token Client', () => {
     jest.mock('soap');
+    jest.mock('fs');
 
     process.env.BANKWIZARD_ENV = 'uat';
 

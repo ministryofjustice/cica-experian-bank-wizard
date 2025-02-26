@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cica-experian-dev
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: cica-experian-dev
+    spec:
+      serviceAccountName: circleci-experian-dev
+      containers:
+        - name: experian-bankwizard-service
+          image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/cica-ebw/cica-experian:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3100
+          env:
+            - name: BANKWIZARD_URL
+              valueFrom:
+                secretKeyRef:
+                  name: experian-aws-secrets
+                  key: bankwizard_url
+            - name: TOKEN_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: experian-aws-secrets
+                  key: token_service_url
+            - name: NODE_ENV
+              value: production
+            - name: BANKWIZARD_ENV
+              value: prod
+  selector:
+    matchLabels:
+      app: cica-experian-dev
