@@ -182,6 +182,7 @@ jobs:
             | kubectl apply -f -
             kubectl apply \
                 -f kube_deploy/Uat/service.yaml \
+                -f kube_deploy/Uat/ingress.yaml
   deploy_to_prod:
     executor: docker-publisher
     steps:
@@ -206,30 +207,7 @@ jobs:
             | kubectl apply -f -
             kubectl apply \
                 -f kube_deploy/Prod/service.yaml \
-  deploy_to_staging:
-    executor: docker-publisher
-    steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Authenticate with cluster
-          command: |
-            echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./live_ca.crt
-            kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./live_ca.crt --server=https://${K8S_CLUSTER_NAME}
-            kubectl config set-credentials circleci --token=${K8S_TOKEN_STAG}
-            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=cica-experian-stag
-            kubectl config use-context ${K8S_CLUSTER_NAME}
-            kubectl config current-context
-            kubectl --namespace=cica-experian-stag get pods
-      - deploy:
-          name: Deploy to the cluster
-          command: |
-            echo "deploy before aws ecr"
-            kubectl set image -f kube_deploy/Stag/deploy.yaml experian-bankwizard-service=${ECR_REGISTRY}/${ECR_REPOSITORY}:${CIRCLE_SHA1} --local -o yaml \
-            | kubectl apply -f -
-            kubectl apply \
-                -f kube_deploy/Stag/service.yaml \
+                -f kube_deploy/Prod/ingress.yaml
 workflows:
   version: 2
   build-test-push-deploytouatapproval-deployuat-deploytoprodapproval-deployprod:
@@ -255,7 +233,6 @@ workflows:
             branches:
               only:
                 - experian-bankwizard-deploy
-                - experian-bankwizard-deploy-to-staging
       - deploy_to_dev_approval:
           type: approval
           requires:
@@ -278,21 +255,6 @@ workflows:
             branches:
               only:
                 - experian-bankwizard-deploy
-      - deploy_to_staging_approval:
-          type: approval
-          requires:
-            - push_image
-          filters:
-            branches:
-              only:
-                - experian-bankwizard-deploy-to-staging
-      - deploy_to_staging:
-          requires:
-            - deploy_to_staging_approval
-          filters:
-            branches:
-              only:
-                - experian-bankwizard-deploy-to-staging
       - deploy_to_prod_approval:
           type: approval
           requires:

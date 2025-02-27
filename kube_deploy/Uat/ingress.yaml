@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cica-ingress-uat
+  namespace: cica-experian-uat
+  annotations:
+    nginx.ingress.kubernetes.io/whitelist-source-range: 51.149.2.7/32,5.148.17.54/32,213.107.167.128/32,86.24.170.98/32,217.44.45.195/32
+    external-dns.alpha.kubernetes.io/set-identifier: cica-ingress-uat-cica-experian-uat-green
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
+spec:
+  ingressClassName: default
+  tls:
+    - hosts:
+        - cica-experian-uat.apps.live.cloud-platform.service.justice.gov.uk
+  rules:
+    - host: cica-experian-uat.apps.live.cloud-platform.service.justice.gov.uk
+      http:
+        paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: cica-experian-uat
+              port:
+                number: 80
