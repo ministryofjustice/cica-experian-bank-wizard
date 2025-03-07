@@ -4,6 +4,7 @@
 'use strict';
 
 const bankwizardErrors = require('../middleware/error-handler/bankwizard-errors');
+const bankwizardErrorType = require('../middleware/error-handler/bankwizard-error-type');
 const errorType = require('../middleware/error-handler/bankwizard-error-type');
 const personalRequest = require('../testing/personalRequest');
 const companyRequest = require('../testing/companyRequest');
@@ -62,7 +63,7 @@ describe('BankWizard service tests', () => {
 
         const response = await bankWizardService.bankWizardRequest(personalRequest, true);
         expect(response.status).toEqual(200);
-        expect(response.body.validateScore).toEqual(true);
+        expect(response.body.validate).toEqual(true);
     });
 
     it('should extract scores for personal requests', async () => {
@@ -72,6 +73,9 @@ describe('BankWizard service tests', () => {
         expect(response.status).toEqual(200);
         expect(response.body.personalScore).toEqual(1);
         expect(response.body.addressScore).toEqual(2);
+        expect(response.body.companyNameScore).toEqual(0);
+        expect(response.body.branchName).toEqual('No data available');
+        expect(response.body.bankName).toEqual('No data available');
     });
 
     it('should extract scores for company requests', async () => {
@@ -79,11 +83,14 @@ describe('BankWizard service tests', () => {
 
         const response = await bankWizardService.bankWizardRequest(companyRequest, false);
         expect(response.status).toEqual(200);
-        expect(response.body.companyScore).toEqual(1);
+        expect(response.body.companyNameScore).toEqual(1);
         expect(response.body.addressScore).toEqual(2);
+        expect(response.body.personalScore).toEqual(0);
+        expect(response.body.branchName).toEqual('No data available');
+        expect(response.body.bankName).toEqual('No data available');
     });
 
-    it('should include branch data', async () => {
+    it('should include valid branch data', async () => {
         bankWizardClient.submitRequest.mockImplementation(normalVerifyResponse);
         bankWizardClient.getBranchData.mockImplementation(getBranchData);
 
@@ -91,6 +98,20 @@ describe('BankWizard service tests', () => {
         expect(response.status).toEqual(200);
         expect(response.body.bankName).toEqual('Test institution');
         expect(response.body.branchName).toEqual('Test branch');
+    });
+
+    it("should include a null error when Experian doesn't give back an error condition", async () => {
+        bankWizardClient.submitRequest.mockImplementation(normalVerifyResponse);
+
+        const personalResponse = await bankWizardService.bankWizardRequest(personalRequest, true);
+        expect(personalResponse.status).toEqual(200);
+        expect(personalResponse.body.error).toBeNull();
+        expect(personalResponse.body.errorType).toEqual(bankwizardErrorType.NO_ERRORS);
+
+        const comapnyResponse = await bankWizardService.bankWizardRequest(personalRequest, true);
+        expect(comapnyResponse.status).toEqual(200);
+        expect(comapnyResponse.body.error).toBeNull();
+        expect(comapnyResponse.body.errorType).toEqual(bankwizardErrorType.NO_ERRORS);
     });
 
     it('should include an error message and type when Experian gives back an error condition', async () => {
@@ -131,7 +152,7 @@ describe('BankWizard service tests', () => {
 
         const companyRes = await bankWizardService.bankWizardRequest(companyRequest, false);
         expect(companyRes.status).toEqual(200);
-        expect(companyRes.body.companyScore).toEqual(0);
+        expect(companyRes.body.companyNameScore).toEqual(0);
         expect(companyRes.body.addressScore).toEqual(0);
     });
 

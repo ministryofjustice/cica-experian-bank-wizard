@@ -4,6 +4,7 @@ const bankwizardClient = require('../services/soap/bankwizard-client');
 const tokenClient = require('../services/soap/token-client');
 const bankwizardErrors = require('../middleware/error-handler/bankwizard-errors');
 const errorType = require('../middleware/error-handler/bankwizard-error-type');
+const bankwizardErrorType = require('../middleware/error-handler/bankwizard-error-type');
 
 // Check if any relevant error conditions returned with the result
 function checkAccountConditions(verifyResult, responseBody) {
@@ -66,12 +67,14 @@ function appendScores(responseBody, verifyResult) {
     } else if (verifyResult.companyInformation) {
         // Add company scores
         if (verifyResult.companyInformation.companyNameScore) {
-            responseBody.companyScore = Number(verifyResult.companyInformation.companyNameScore);
-            if (Number.isNaN(responseBody.companyScore)) {
+            responseBody.companyNameScore = Number(
+                verifyResult.companyInformation.companyNameScore,
+            );
+            if (Number.isNaN(responseBody.companyNameScore)) {
                 return null;
             }
         } else {
-            responseBody.companyScore = 0;
+            responseBody.companyNameScore = 0;
         }
         if (verifyResult.companyInformation.companyNameAndAddressScore) {
             responseBody.addressScore = Number(
@@ -102,13 +105,20 @@ async function bankWizardRequest(req, personal) {
     const result = await bankwizardClient.submitRequest(req, personal, token);
 
     // Start building the response
-    const responseBody = {};
+    const responseBody = {
+        companyNameScore: 0,
+        personalScore: 0,
+        addressScore: 0,
+        validate: false,
+        errorType: bankwizardErrorType.NO_ERRORS,
+        error: null,
+        branchName: 'No data available',
+        bankName: 'No data available',
+    };
 
     const validateScore = checkAccountConditions(result, responseBody);
 
-    responseBody.validateScore = validateScore;
-    responseBody.branchName = 'No data available';
-    responseBody.bankName = 'No data available';
+    responseBody.validate = validateScore;
 
     // If the account was a match in the data try and get the bank details
     if (validateScore) {
