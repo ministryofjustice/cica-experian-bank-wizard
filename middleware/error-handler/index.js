@@ -7,7 +7,16 @@ const errorType = require('./bankwizard-error-type');
 // https://github.com/i0natan/nodebestpractices/blob/master/sections/errorhandling/centralizedhandling.md
 // eslint-disable-next-line no-unused-vars
 module.exports = async (err, req, res, next) => {
-    const error = {};
+    const error = {
+        companyNameScore: 0,
+        personalScore: 0,
+        addressScore: 0,
+        validated: false,
+        errorType: errorType.NO_ERRORS,
+        error: null,
+        branchName: null,
+        bankName: null,
+    };
 
     if (
         (err.code && (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT')) ||

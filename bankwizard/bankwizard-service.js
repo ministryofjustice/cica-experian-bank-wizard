@@ -112,8 +112,8 @@ async function bankWizardRequest(req, personal) {
         validated: false,
         errorType: bankwizardErrorType.NO_ERRORS,
         error: null,
-        branchName: 'No data available',
-        bankName: 'No data available',
+        branchName: null,
+        bankName: null,
     };
 
     const validateScore = checkAccountConditions(result, responseBody);
@@ -138,6 +138,8 @@ async function bankWizardRequest(req, personal) {
         if (!hasBankData) {
             responseBody.error = 'No branch or bank data could be retrieved for this account';
             responseBody.errorType = errorType.NO_BRANCH_DATA;
+            responseBody.branchName = 'No data available';
+            responseBody.bankName = 'No data available';
         }
     }
 
