@@ -63,7 +63,7 @@ describe('BankWizard service tests', () => {
 
         const response = await bankWizardService.bankWizardRequest(personalRequest, true);
         expect(response.status).toEqual(200);
-        expect(response.body.validate).toEqual(true);
+        expect(response.body.validated).toEqual(true);
     });
 
     it('should extract scores for personal requests', async () => {

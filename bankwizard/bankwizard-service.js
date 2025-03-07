@@ -109,7 +109,7 @@ async function bankWizardRequest(req, personal) {
         companyNameScore: 0,
         personalScore: 0,
         addressScore: 0,
-        validate: false,
+        validated: false,
         errorType: bankwizardErrorType.NO_ERRORS,
         error: null,
         branchName: 'No data available',
@@ -118,7 +118,7 @@ async function bankWizardRequest(req, personal) {
 
     const validateScore = checkAccountConditions(result, responseBody);
 
-    responseBody.validate = validateScore;
+    responseBody.validated = validateScore;
 
     // If the account was a match in the data try and get the bank details
     if (validateScore) {
