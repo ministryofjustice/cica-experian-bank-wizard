@@ -127,7 +127,7 @@ async function bankWizardRequest(req, personal) {
             // Wait 100ms to allow the previous connection to BankWizard to close
             await sleep(100);
             const branchData = await bankwizardClient.getBranchData(result, token);
-            if (branchData) {
+            if (branchData && branchData.branchName && branchData.institutionName) {
                 // If able to get the bank details, replace the placeholder with these
                 responseBody.branchName = branchData.branchName;
                 responseBody.bankName = branchData.institutionName;
