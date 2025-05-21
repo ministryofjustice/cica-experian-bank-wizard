@@ -40,8 +40,10 @@ module.exports = [
         },
 
         rules: {
-            'prettier/prettier': ['error'],
-            'linebreak-style': ['error', 'unix'],
+            'prettier/prettier': [
+                'error',
+                {endOfLine: process.platform === 'win32' ? 'crlf' : 'lf'},
+            ],
             curly: ['error', 'all'],
             'jest/expect-expect': ['error'],
             strict: ['error', 'safe'],
