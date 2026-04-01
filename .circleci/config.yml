@@ -15,7 +15,7 @@ executors:
 jobs:
   build-for-test:
     docker:
-      - image: 'node:22.8.0-bookworm-slim'
+      - image: 'node:24.13.0-trixie-slim'
     steps:
       - checkout
       - run:
@@ -37,7 +37,7 @@ jobs:
             - ./openapi
   test:
     docker:
-      - image: 'node:22.8.0-bookworm-slim'
+      - image: 'node:24.13.0-trixie-slim'
     steps:
       - attach_workspace:
           at: ./
@@ -48,7 +48,7 @@ jobs:
           command: npx --no-install jest --ci --runInBand --bail --silent --coverage --projects jest.config.js
   lint:
     docker:
-      - image: 'node:22.8.0-bookworm-slim'
+      - image: 'node:24.13.0-trixie-slim'
     steps:
       - attach_workspace:
           at: ./
