@@ -4,9 +4,7 @@ Experian Bankwizard is an API that interacts with Experian's Bank Wizard SOAP AP
 
 # Prerequisites
 
-This project was developed with the following system dependencies:
-- NPM `">=11.6.2"`
-- Node `">=24.13.0"`
+Refer to the [package.json](package.json#L4) for recommended node and npm system dependencies.
 
 # Installation
 

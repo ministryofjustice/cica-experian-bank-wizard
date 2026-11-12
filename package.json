@@ -2,8 +2,8 @@
     "name": "experian-bankwizard-service",
     "version": "1.0.2",
     "engines": {
-        "npm": ">=11.6.2",
-        "node": ">=24.13.0"
+        "npm": ">=11.19.1",
+        "node": ">=24.22.2"
     },
     "scripts": {
         "start": "node ./bin/www",
