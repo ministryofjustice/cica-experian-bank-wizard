@@ -15,7 +15,7 @@ executors:
 jobs:
   build-for-test:
     docker:
-      - image: 'node:24.13.0-trixie-slim'
+      - image: 'node:24.22.2-trixie-slim@sha256:0820eaa85e07d0490446dd01d14707e17e6108a36988cf374899cd057eb3812d'
     steps:
       - checkout
       - run:
@@ -26,34 +26,34 @@ jobs:
           paths:
           - '*'
       - restore_cache:
-          key: v1-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v2-node24-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
       - run:
           name: Install npm dependencies
           command: 'if [ -d node_modules ]; then echo package.json and package-lock.json unchanged. Using node_modules cache.; else npm ci --loglevel warn --yes; fi'
       - save_cache:
-          key: v1-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v2-node24-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
             - ./openapi
   test:
     docker:
-      - image: 'node:24.13.0-trixie-slim'
+      - image: 'node:24.22.2-trixie-slim@sha256:0820eaa85e07d0490446dd01d14707e17e6108a36988cf374899cd057eb3812d'
     steps:
       - attach_workspace:
           at: ./
       - restore_cache:
-          key: v1-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v2-node24-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
       - run:
           name: Run tests and code coverage
           command: npx --no-install jest --ci --runInBand --bail --silent --coverage --projects jest.config.js
   lint:
     docker:
-      - image: 'node:24.13.0-trixie-slim'
+      - image: 'node:24.22.2-trixie-slim@sha256:0820eaa85e07d0490446dd01d14707e17e6108a36988cf374899cd057eb3812d'
     steps:
       - attach_workspace:
           at: ./
       - restore_cache:
-          key: v1-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v2-node24-npm-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
       - run:
           name: Lint codebase
           command: npx --no-install eslint .
