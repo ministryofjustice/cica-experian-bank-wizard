@@ -45,7 +45,7 @@ Set these in your `.env` and run `npm run start:stub`:
 
 ```
 NODE_ENV=development
-BANKWIZARD_ENV=uat
+BANKWIZARD_ENV=stub
 PORT=3100
 
 BANKWIZARD_URL=http://localhost:8000/wsdl
@@ -79,6 +79,7 @@ docker build -t cica-experian-bank-wizard:local .
 docker run --rm --name cica-experian-bank-wizard \
   --add-host=host.docker.internal:host-gateway \
   --env-file .env \
+  -e BANKWIZARD_ENV=stub \
   -e BANKWIZARD_URL=http://host.docker.internal:8000/wsdl \
   -e TOKEN_SERVICE_URL=http://host.docker.internal:8000/token \
   -p 3100:3100 \

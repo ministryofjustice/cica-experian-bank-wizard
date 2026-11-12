@@ -14,6 +14,7 @@
         "prepare": "npm run openapi:build",
         "pretest": "npm run openapi:build",
         "test": "jest",
+        "test:integration:local": "node local-integration/run.js",
         "coverage": "jest --coverage",
         "stub": "node ./stubs/bankwizard-stub.js",
         "dump-eslint-conf": "eslint --print-config ./app.js > ./stuff/eslint-conf.json",
