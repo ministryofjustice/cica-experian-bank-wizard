@@ -1,30 +1,34 @@
-# lets start from an image that already has nodejs installed
-FROM node:24.13.0-trixie-slim  as base
+# Keep the full tag and digest in the ARG default so both stages share the same image.
+ARG BASE_IMAGE=node:24.22.2-trixie-slim@sha256:0820eaa85e07d0490446dd01d14707e17e6108a36988cf374899cd057eb3812d
+
+FROM ${BASE_IMAGE} AS builder
+
+WORKDIR /usr/src/app
+
+# npm ci runs prepare, which builds the OpenAPI contract from these sources.
+COPY . .
+RUN npm ci --include=dev
+RUN npm prune --omit=dev --ignore-scripts
+
+# Keep production last: CircleCI builds without an explicit --target.
+FROM ${BASE_IMAGE} AS production
+
+WORKDIR /usr/src/app
 
 RUN groupadd -g 1014 dc_user \
     && useradd -rm -d /usr/src/app -u 1015 -g dc_user dc_user
-USER dc_user
 
-# Essentially running mkdir <name> inside the current working
-# directory, and then cd <name>
-WORKDIR /usr/src/app
+COPY --from=builder --chown=dc_user:dc_user /usr/src/app .
 
-# Bundle app source
-COPY --chown=dc_user:dc_user . .
+# npm is only needed during the build, not to run the service.
+RUN rm -rf /usr/local/lib/node_modules/npm \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx
 
-# Defult to production. npm will ignore devDependencies in production mode
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-# RUN npm install
-# If you are building your code for production
-RUN npm ci
+USER 1015
 
-# Expose port 3100 inside the container to the outside world
-# so that http://localhost:3100 routes the network traffic to
-# the container
 EXPOSE 3100
 
-USER 1015
-# the command line to run when the container is started
-CMD [ "npm", "start" ]
+CMD ["node", "./bin/www"]
