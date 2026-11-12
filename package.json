@@ -31,7 +31,7 @@
         "eslint-plugin-prettier": "^5.5.7",
         "express": "^4.22.3",
         "express-openapi-validator": "^5.6.2",
-        "globals": "^15.15.0",
+        "globals": "^17.14.0",
         "helmet": "^8.3.0",
         "pino-http": "^10.5.0",
         "pino-pretty": "^13.2.0",
