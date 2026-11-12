@@ -53,7 +53,7 @@ Set these in your `.env` and run `npm run start:stub`:
 
 ```
 NODE_ENV=development
-BANKWIZARD_ENV=uat
+BANKWIZARD_ENV=stub
 PORT=3100
 
 BANKWIZARD_URL=http://localhost:8000/wsdl
@@ -86,6 +86,7 @@ docker build -t cica-experian-bank-wizard:local .
 docker run --rm --name cica-experian-bank-wizard \
   --add-host=host.docker.internal:host-gateway \
   --env-file .env \
+  -e BANKWIZARD_ENV=stub \
   -e BANKWIZARD_URL=http://host.docker.internal:8000/wsdl \
   -e TOKEN_SERVICE_URL=http://host.docker.internal:8000/token \
   -p 3100:3100 \
@@ -96,6 +97,26 @@ The `--add-host` option lets the container reach the stub on the host on Linux. 
 overrides are needed because `localhost` inside the container refers to the container itself.
 The app is available at `http://localhost:3100`. This assumes the required WSDL and XSD
 artifacts are present in the build context.
+
+### Local Docker integration test
+
+With Docker running and the external WSDL and XSD files present, run:
+
+```sh
+npm run test:integration:local
+```
+
+This builds the production image, then starts the app and SOAP stub inside a temporary
+container with networking disabled and an empty, read-only SSL directory. No host ports are published, so an existing app on
+port 3100 is unaffected. The test checks status, personal and company responses (including
+scores and branch data), plus rejection of an invalid request. It uses fabricated fixtures
+and the real HTTP/SOAP clients, not Jest mocks.
+
+The explicit `BANKWIZARD_ENV=stub` mode requires both SOAP URLs to use local HTTP hosts and
+skips client-certificate loading. Real Experian access continues to require `uat` or `prod`
+and the corresponding certificates. The test overrides the endpoints without reading or
+changing your host `.env`, cannot reach Experian, and removes its container on completion.
+The locally built `cica-experian-bank-wizard:local-integration` image is retained for reuse.
 
 > Note: `npm run start:stub` launches the dev server and the stub together. If you see
 > `EADDRINUSE: address already in use :::8000`, a previous stub (or `bin/www`) is still running.
