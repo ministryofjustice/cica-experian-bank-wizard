@@ -2,6 +2,7 @@
 
 const prettier = require('eslint-plugin-prettier');
 const fp = require('eslint-plugin-fp');
+const importPlugin = require('eslint-plugin-import-x');
 const globals = require('globals');
 const js = require('@eslint/js');
 const {FlatCompat} = require('@eslint/eslintrc');
@@ -16,11 +17,13 @@ module.exports = [
     {
         ignores: ['**/coverage', '**/stuff'],
     },
-    ...compat.extends('airbnb-base', 'prettier', 'plugin:jest/recommended'),
+    js.configs.recommended,
+    ...compat.extends('prettier', 'plugin:jest/recommended'),
     {
         plugins: {
             prettier,
             fp,
+            import: importPlugin,
         },
 
         languageOptions: {
@@ -48,6 +51,7 @@ module.exports = [
             'jest/expect-expect': ['error'],
             strict: ['error', 'safe'],
             'import/extensions': ['off'],
+            'import/no-extraneous-dependencies': ['off'],
             'fp/no-class': 'error',
 
             'no-param-reassign': [
