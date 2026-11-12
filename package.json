@@ -51,7 +51,8 @@
         "supertest": "^7.3.2"
     },
     "overrides": {
-        "glob": "^10.3.10"
+        "glob": "^10.3.10",
+        "minimatch": "^11.0.1"
     },
     "license": "MIT"
 }
