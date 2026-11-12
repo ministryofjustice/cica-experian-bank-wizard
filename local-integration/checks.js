@@ -5,13 +5,17 @@
 const assert = require('node:assert/strict');
 const {spawn} = require('node:child_process');
 const {setTimeout: delay} = require('node:timers/promises');
+const pino = require('pino');
 
 const personalRequest = require('../testing/personalRequest');
 const companyRequest = require('../testing/companyRequest');
 
+const logger = pino({level: 'info'});
+
 const baseUrl = 'http://127.0.0.1:3100';
 const env = {
-    ...process.env,
+    NODE_ENV: 'test',
+    DCS_LOG_LEVEL: 'info',
     BANKWIZARD_ENV: 'stub',
     BANKWIZARD_URL: 'http://127.0.0.1:8000/wsdl',
     TOKEN_SERVICE_URL: 'http://127.0.0.1:8000/token',
@@ -61,7 +65,7 @@ async function run() {
     ];
     const closed = children.map((child) => {
         child.on('error', (err) => {
-            console.error(`Unable to start service: ${err.message}`);
+            logger.error({err: err.message}, 'Unable to start service');
         });
         return new Promise((resolve) => {
             child.once('close', resolve);
@@ -111,6 +115,6 @@ async function run() {
 }
 
 run().catch((err) => {
-    console.error(err);
+    logger.error({err: err.message}, 'Integration test failed');
     process.exitCode = 1;
 });
