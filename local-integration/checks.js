@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 'use strict';
 
 const assert = require('node:assert/strict');
@@ -30,9 +28,7 @@ async function waitFor(url, children) {
         }
         try {
             // Readiness probes must run sequentially.
-            // eslint-disable-next-line no-await-in-loop
             const response = await fetch(url, {signal: AbortSignal.timeout(1000)});
-            // eslint-disable-next-line no-await-in-loop
             await response.text();
             if (response.ok) {
                 return;
@@ -41,7 +37,6 @@ async function waitFor(url, children) {
         } catch (err) {
             lastError = err;
         }
-        // eslint-disable-next-line no-await-in-loop
         await delay(100);
     }
     throw new Error(`Service not ready at ${url}: ${lastError.message}`);
