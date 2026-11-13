@@ -1,6 +1,7 @@
 'use strict';
 
 const request = require('supertest');
+const {version: appVersion} = require('../package.json');
 
 const personalRequest = require('../testing/personalRequest');
 const companyRequest = require('../testing/companyRequest');
@@ -18,7 +19,6 @@ describe('REST endpoint tests', () => {
         })),
     }));
 
-    // eslint-disable-next-line global-require
     const app = require('../app');
 
     describe('POST /api/v2/bankwizard/personal', () => {
@@ -63,5 +63,11 @@ describe('REST endpoint tests', () => {
     it('should return status 404 for invalid endpoints', async () => {
         const response = await request(app).get('/api/v2/bankwizard/notanendpoint').send();
         expect(response.status).toEqual(404);
+    });
+
+    it('should set the application version without relying on npm start', async () => {
+        const response = await request(app).get('/notanendpoint').send();
+        expect(response.status).toEqual(404);
+        expect(response.headers['application-version']).toEqual(appVersion);
     });
 });

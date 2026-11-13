@@ -1,5 +1,3 @@
-/* eslint-disable global-require */
-
 'use strict';
 
 // Some of the testing for this file is handled in the routes testing.

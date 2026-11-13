@@ -18,6 +18,21 @@ async function getToken() {
         application: 'CICA BankWizard Middleware Service',
         checkIP: true,
     };
+
+    if (env === 'stub') {
+        const endpoints = [url, process.env.BANKWIZARD_URL];
+        const localHosts = ['localhost', '127.0.0.1', '[::1]', 'host.docker.internal'];
+        endpoints.forEach((endpoint) => {
+            const parsed = new URL(endpoint);
+            if (parsed.protocol !== 'http:' || !localHosts.includes(parsed.hostname)) {
+                throw new Error('Stub mode requires local HTTP SOAP endpoints');
+            }
+        });
+        const client = await soap.createClientAsync(wsdl, {}, url);
+        const result = await client.LoginWithCertificateAsync(request);
+        return btoa(result[0].LoginWithCertificateResult);
+    }
+
     const security = new soap.ClientSSLSecurity(privateKey, publicCert, ca, {
         rejectUnauthorized: false,
     });

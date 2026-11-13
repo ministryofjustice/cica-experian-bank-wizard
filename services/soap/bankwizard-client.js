@@ -152,8 +152,7 @@ async function getBranchData(verifyResult, token) {
 async function submitRequest(req, personal, token) {
     const securityHeader = buildTokenHeader(token);
 
-    let request = {};
-    request = buildVerifyRequest(req, personal);
+    const request = buildVerifyRequest(req, personal);
 
     const client = await soap.createClientAsync(wsdl, soapOptions, url);
     client.addSoapHeader(securityHeader);
