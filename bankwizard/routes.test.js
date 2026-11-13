@@ -19,7 +19,6 @@ describe('REST endpoint tests', () => {
         })),
     }));
 
-    // eslint-disable-next-line global-require
     const app = require('../app');
 
     describe('POST /api/v2/bankwizard/personal', () => {

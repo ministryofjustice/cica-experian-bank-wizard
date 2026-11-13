@@ -10,7 +10,6 @@ describe('Token Client', () => {
 
     process.env.BANKWIZARD_ENV = 'uat';
 
-    // eslint-disable-next-line global-require
     const tokenClient = require('./token-client');
 
     // requires UAT ssl certificates to be present
@@ -35,11 +34,8 @@ describe('Token Client', () => {
             });
 
             it('uses the token SOAP client without reading certificates', async () => {
-                // eslint-disable-next-line global-require
                 const soap = require('soap');
-                // eslint-disable-next-line global-require
                 const fs = require('fs');
-                // eslint-disable-next-line global-require
                 const stubClient = require('./token-client');
 
                 expect(atob(await stubClient.getToken())).toEqual('SOAPToken');
@@ -53,7 +49,6 @@ describe('Token Client', () => {
                 ['TOKEN_SERVICE_URL', 'https://127.0.0.1:8000/token'],
             ])('refuses unsafe stub endpoint %s=%s', async (variable, endpoint) => {
                 process.env[variable] = endpoint;
-                // eslint-disable-next-line global-require
                 const stubClient = require('./token-client');
                 await expect(stubClient.getToken()).rejects.toThrow(
                     'Stub mode requires local HTTP SOAP endpoints',

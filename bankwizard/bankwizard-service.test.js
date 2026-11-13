@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable global-require */
 
 'use strict';
 

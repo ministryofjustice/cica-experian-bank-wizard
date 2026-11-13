@@ -62,4 +62,12 @@ module.exports = [
             ],
         },
     },
+    {
+        files: ['**/*.test.js', '**/stubs/**', '**/local-integration/**', '**/openapi/**'],
+        rules: {
+            'no-console': 'off',
+            'global-require': 'off',
+            'no-await-in-loop': 'off',
+        },
+    },
 ];

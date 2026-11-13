@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 'use strict';
 
 const {spawnSync} = require('node:child_process');
