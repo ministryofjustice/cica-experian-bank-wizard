@@ -1,5 +1,5 @@
 # Keep the full tag and digest in the ARG default so both stages share the same image.
-ARG BASE_IMAGE=node:24.22.2-trixie-slim@sha256:0820eaa85e07d0490446dd01d14707e17e6108a36988cf374899cd057eb3812d
+ARG BASE_IMAGE=node:26.13.1-alpine3.23@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5
 
 FROM ${BASE_IMAGE} AS builder
 
@@ -15,8 +15,8 @@ FROM ${BASE_IMAGE} AS production
 
 WORKDIR /usr/src/app
 
-RUN groupadd -g 1014 dc_user \
-    && useradd -rm -d /usr/src/app -u 1015 -g dc_user dc_user
+RUN addgroup -g 1014 dc_user \
+    && adduser -S -D -h /usr/src/app -u 1015 -G dc_user dc_user
 
 COPY --from=builder --chown=dc_user:dc_user /usr/src/app .
 
