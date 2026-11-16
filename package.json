@@ -11,7 +11,7 @@
         "start:stub": "npm run start:dev & npm run stub",
         "openapi:build": "redocly lint openapi/src/openapi-src.json && redocly bundle ./openapi/src/openapi-src.json --output ./openapi/openapi.json && node ./openapi/src/dereference-openapi.js",
         "build:run:dev": "npm run openapi:build && node --inspect=0.0.0.0:9229 ./bin/www",
-        "prepare": "npm run openapi:build",
+        "prepare": "npm run openapi:build && (test -n \"$CI\" || test ! -e .git || husky)",
         "pretest": "npm run openapi:build",
         "test": "jest",
         "test:integration:local": "node local-integration/run.js",
@@ -46,6 +46,7 @@
         "eslint-plugin-jest": "^29.17.0",
         "husky": "^9.1.7",
         "jest": "^30.5.2",
+        "lint-staged": "^17.6.1",
         "nodemon": "^3.1.14",
         "prettier": "^3.10.1",
         "supertest": "^7.3.2"
