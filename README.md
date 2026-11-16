@@ -2,11 +2,11 @@
 
 Experian Bankwizard is an API that interacts with Experian's Bank Wizard SOAP API that verifies bank account details. Consumed by the case management system.
 
-# Prerequisites
+## Prerequisites
 
 Refer to the [package.json](package.json#L4) for recommended node and npm system dependencies.
 
-# Installation
+## Installation
 
 - Clone the repo down to your machine
 - Run `npm install`
@@ -15,7 +15,7 @@ Refer to the [package.json](package.json#L4) for recommended node and npm system
 
 ## Files required for local development
 
-Local stub development and local Docker integration tests require the following Experian-supplied WSDL and XSD files. They are not stored in Git and can be obtained from the Infrastructure vault or directly from Experian.
+Local stub development and local Docker integration tests require the following Experian-supplied WSDL and XSD files. They are not stored in Git and can be obtained from the Infrastructure team vault or directly from Experian.
 
 Place them in the project as follows:
 
@@ -63,8 +63,8 @@ directly as user `1015`, without npm or npx. It is the default build target.
 Do not put production certificate materials in the local build context: files in `ssl/`
 are included in the Docker image if present, even when using the stub.
 
-The Docker image contains the app, not the local stub. Start the stub on your host in one
-terminal:
+The Docker image contains the app, not the local stub. Start only the stub on your host in
+one terminal (`start:stub` would also start the app on the host):
 
 ```sh
 npm run stub
