@@ -1,2 +1,1 @@
-npm run lint
-npm run coverage
+npx --no-install lint-staged --concurrent false

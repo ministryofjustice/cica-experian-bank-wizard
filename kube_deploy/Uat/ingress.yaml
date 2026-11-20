@@ -8,7 +8,7 @@ metadata:
     external-dns.alpha.kubernetes.io/set-identifier: cica-ingress-uat-cica-experian-uat-green
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 spec:
-  ingressClassName: default
+  ingressClassName: default-non-prod
   tls:
     - hosts:
         - cica-experian-uat.apps.live.cloud-platform.service.justice.gov.uk

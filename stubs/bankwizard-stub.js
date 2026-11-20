@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 
 'use strict';
@@ -10,6 +9,7 @@ const http = require('http');
 const getBranchDataResponse = require('../testing/getBranchResponse');
 
 const wsdl = fs.readFileSync('./BankWizardService-v1.wsdl', 'utf8');
+const tokenWsdl = fs.readFileSync('./TokenService.wsdl', 'utf8');
 
 const server = http.createServer((req, res) => {
     res.end(`404 Not Found: ${req.url}`);
@@ -91,10 +91,34 @@ const service = {
     },
 };
 
+// Stubbed Token service. The real Experian WASP authenticator returns an
+// encoded token string; the token client only reads LoginWithCertificateResult.
+function LoginWithCertificate(args, cb, headers, req) {
+    return {
+        LoginWithCertificateResult: 'stub-token',
+    };
+}
+
+const tokenService = {
+    TokenService: {
+        TokenServiceSoap: {
+            LoginWithCertificate,
+        },
+    },
+};
+
 soap.listen(server, '/wsdl', service, wsdl, (err, res) => {
     if (err) {
         console.error(err.message);
     } else {
-        console.log('Stub soap server started');
+        console.log('Stub BankWizard soap server started on /wsdl');
+    }
+});
+
+soap.listen(server, '/token', tokenService, tokenWsdl, (err, res) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('Stub Token soap server started on /token');
     }
 });

@@ -1,6 +1,5 @@
 'use strict';
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 const $RefParser = require('@apidevtools/json-schema-ref-parser');
 const fs = require('fs');
 
@@ -14,7 +13,6 @@ const fs = require('fs');
         }
 
         // success case, the file was saved
-        // eslint-disable-next-line
         console.log('dereferenced contract saved');
     });
 })();

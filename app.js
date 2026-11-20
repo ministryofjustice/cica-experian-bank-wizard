@@ -10,6 +10,7 @@ const OpenApiValidator = require('express-openapi-validator');
 const errorHandler = require('./middleware/error-handler');
 const docsRouter = require('./docs/routes');
 const bankWizardRouter = require('./bankwizard/routes');
+const {version: appVersion} = require('./package.json');
 
 if (!process.env.DCS_LOG_LEVEL) {
     process.env.DCS_LOG_LEVEL = 'info';
@@ -98,9 +99,7 @@ app.use(
 app.use((req, res, next) => {
     // Default to JSON content type for all subsequent responses
     res.type('application/json');
-    // https://stackoverflow.com/a/22339262/2952356
-    // `process.env.npm_package_version` only works if you use npm start to run the app.
-    res.set('Application-Version', process.env.npm_package_version);
+    res.set('Application-Version', appVersion);
 
     next();
 });
@@ -108,6 +107,8 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
     // Get pino to attach the correct error and stack trace to the log entry
     // https://github.com/pinojs/pino-http/issues/61
+    // Attach the raw error so the `err` serializer above can render it
+    // (assigning a plain object here previously produced `err: {}` in logs).
     res.err = {
         name: err.name,
         message: err.message,
